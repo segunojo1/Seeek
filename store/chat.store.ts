@@ -5,20 +5,16 @@ import { chatService } from '@/services/chat.service'
 interface ChatStore {
   messages: ChatMessage[]
   isLoading: boolean
-  currentChatId: string | null
   addMessage: (message: ChatMessage) => void
   setMessages: (messages: ChatMessage[]) => void
   clearMessages: () => void
   setIsLoading: (isLoading: boolean) => void
-  setCurrentChatId: (chatId: string | null) => void
-  sendMessage: (message: string, file?: File) => Promise<void>
-  fetchPreviousInteractions: () => Promise<ChatMessage[]>
+  sendMessage: (message: string) => Promise<void>
 }
 
 export const useChatStore = create<ChatStore>((set, get) => ({
   messages: [],
   isLoading: false,
-  currentChatId: null,
 
   addMessage: (message: ChatMessage) => {
     set((state) => ({
@@ -34,36 +30,32 @@ export const useChatStore = create<ChatStore>((set, get) => ({
     set({ isLoading })
   },
 
-  setCurrentChatId: (chatId: string | null) => {
-    set({ currentChatId: chatId })
-  },
-
   setMessages: (messages: ChatMessage[]) => {
     set({ messages })
   },
 
-  sendMessage: async (message: string, file?: File) => {
-    if (!message.trim() && !file) return
-console.log('send message');
+  sendMessage: async (message: string) => {
+    if (!message.trim()) return
 
-    const { addMessage, setIsLoading } = get()
+    const { messages, addMessage, setIsLoading } = get()
 
-    // Add user message with optional file attachment
+    // Add user message
     const userMessage: ChatMessage = {
       role: 'user',
       content: message,
-      attachments: file ? [file] : []
     }
     addMessage(userMessage)
 
     try {
       setIsLoading(true)
 
-      const response = await chatService.sendMessage(message)
+      // Send with current chat history (including the new user message)
+      const allMessages = [...messages, userMessage]
+      const response = await chatService.sendMessage(message, allMessages)
       addMessage(response)
     } catch (error) {
       console.error('Error sending message:', error)
-      
+
       const errorMessage: ChatMessage = {
         role: 'assistant',
         content: 'Sorry, there was an error processing your message.'
@@ -73,23 +65,4 @@ console.log('send message');
       setIsLoading(false)
     }
   },
-
-  fetchPreviousInteractions: async () => {
-    try {
-      const { setIsLoading } = get()
-      setIsLoading(true)
-      
-      const messages = await chatService.getPreviousInteractions()
-      if (messages.length > 0) {
-        // Only set messages if we got some back
-        return messages
-      }
-      return []
-    } catch (error) {
-      console.error('Error fetching previous interactions:', error)
-      return []
-    } finally {
-      get().setIsLoading(false)
-    }
-  }
 }))

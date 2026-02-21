@@ -24,7 +24,7 @@ interface ProductsStore {
   fetchAllBlogs: () => Promise<void>;
   
   currentMeal: MealDetails | null;
-  fetchMealDetails: (mealName: string, profileId: string) => Promise<MealDetails | null>;
+  fetchMealDetails: (mealName: string) => Promise<MealDetails | null>;
   setCurrentMeal: (meal: MealDetails | null) => void;
   fetchBlogById: (id: string) => Promise<BlogPost | null>;
   setCurrentBlog: (blog: BlogPost | null) => void;
@@ -46,11 +46,11 @@ export const useProductsStore = create<ProductsStore>((set, get) => ({
   // Meal details actions
   setCurrentMeal: (meal) => set({ currentMeal: meal }),
   
-  fetchMealDetails: async (mealName, profileId) => {
+  fetchMealDetails: async (mealName) => {
     try {
       set({ isLoading: true, error: null });
       
-      const { data, error } = await productService.getMealDetails(mealName, profileId);
+      const { data, error } = await productService.getMealDetails(mealName);
       
       if (error) {
         console.warn('Error in meal details response:', error);

@@ -121,10 +121,10 @@ export function AppSidebar() {
     { title: "Explore", url: "/explore", icon: Search },
     { title: "Home", url: "/home", icon: Home },
     { title: "Chat", url: "/chat", icon: Inbox },
-    { title: "Scan", url: "/home", icon: Inbox },
-    { title: "Routine", url: "/home", icon: Inbox },
-    { title: "Reports", url: "/chat", icon: Inbox },
-    { title: "History", url: "/home", icon: Inbox },
+    // { title: "Scan", url: "/home", icon: Inbox },
+    // { title: "Routine", url: "/home", icon: Inbox },
+    // { title: "Reports", url: "/chat", icon: Inbox },
+    // { title: "History", url: "/home", icon: Inbox },
   ];
   const workspaceItems = [
     { title: "Canvas", url: "/home", icon: Search },

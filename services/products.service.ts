@@ -99,6 +99,17 @@ export interface ImageScanResponse {
   };
 }
 
+export interface QrCodeAnalysisResponse {
+  response: {
+    identified_dish: string;
+    identified_ingredients: string[];
+    risk_assessment: ImageScanRiskItem[];
+    educational_questions: string[];
+    personalized_alternatives: ImageScanAlternative[];
+    detailed_information_about_the_dish: string;
+  };
+}
+
 export class ProductService {
   private api: AxiosInstance;
   private static instance: ProductService;
@@ -195,17 +206,12 @@ export class ProductService {
 
   public async getMealDetails(
     mealName: string,
-    profileId: string,
   ): Promise<{ data: MealDetails | null; error: string | null }> {
     try {
-      const response = await this.api.get<MealDetails>(
-        "/api/MealRecommendation/generate",
-        {
-          params: { mealName, profileId },
-        },
-      );
+      const response = await this.api.post<MealDetails>("/api/v1/getAnalysis", {
+        mealName,
+      });
 
-      // If we have data, return it regardless of isSuccessful flag
       if (response.data) {
         return { data: response.data, error: null };
       }
@@ -247,6 +253,30 @@ export class ProductService {
       return {
         data: null,
         error: error.response?.data?.message || "Failed to scan image",
+      };
+    }
+  }
+
+  public async analyzeQrCode(
+    scanData: string,
+  ): Promise<{ data: QrCodeAnalysisResponse | null; error: string | null }> {
+    try {
+      const response = await this.api.post<QrCodeAnalysisResponse>(
+        "/api/v1/analyzeQrCode",
+        { scanData },
+      );
+
+      if (response.data) {
+        return { data: response.data, error: null };
+      }
+
+      return { data: null, error: "No QR code analysis data received" };
+    } catch (error: any) {
+      console.error("Error analyzing QR code:", error);
+      return {
+        data: null,
+        error:
+          error.response?.data?.message || "Failed to analyze QR code data",
       };
     }
   }

@@ -38,7 +38,7 @@ const ChatInputForm = ({
     "webkitSpeechRecognition" in window || "SpeechRecognition" in window;
   const [selectedFile, setSelectedFile] = useState<File | null>(null);
   const [previewUrl, setPreviewUrl] = useState<string>("");
-  const [mode, setMode] = useState<"ask" | "search" | "scan">("ask");
+  const [mode, setMode] = useState<"ask" | "search" | "scan" | "barcode">("ask");
   const [isListening, setIsListening] = useState<boolean>(false);
   const [volume, setVolume] = useState<number>(0);
   const [interimTranscript, setInterimTranscript] = useState<string>("");
@@ -149,7 +149,7 @@ const ChatInputForm = ({
   });
 
   const { isLoading } = useChatStore();
-  const { scanImage, isScanning } = useScanStore();
+  const { scanImage, scanBarcode, isScanning } = useScanStore();
 
   const handleSubmit = async (values: z.infer<typeof chatSchema>) => {
     const message = values.chat.trim();
@@ -169,6 +169,17 @@ const ChatInputForm = ({
         } else {
           toast.error("Failed to analyze the image. Please try again.");
         }
+      } else if (mode === "barcode" && selectedFile) {
+        // For barcode mode, extract barcode data and send to API
+        const result = await scanBarcode(selectedFile);
+        if (result) {
+          router.push("/meal/scan");
+        } else {
+          toast.error(
+            useScanStore.getState().error ||
+              "Could not read barcode. Please try a clearer image.",
+          );
+        }
       } else {
         // For ask mode or when there's no file in scan mode
         onSend(message, selectedFile || undefined);
@@ -180,7 +191,7 @@ const ChatInputForm = ({
     } catch (error) {
       console.error("Error:", error);
       toast.error(
-        `Failed to ${mode === "search" ? "search" : mode === "scan" ? "scan image" : "send message"}`,
+        `Failed to ${mode === "search" ? "search" : mode === "scan" ? "scan image" : mode === "barcode" ? "scan barcode" : "send message"}`,
       );
     }
   };
@@ -193,13 +204,16 @@ const ChatInputForm = ({
     const file = e.target.files?.[0];
     if (!file) return;
 
-    // For scan mode, only allow images
-    if (mode === "scan" && !file.type.startsWith("image/")) {
+    // For scan/barcode mode, only allow images
+    if (
+      (mode === "scan" || mode === "barcode") &&
+      !file.type.startsWith("image/")
+    ) {
       toast.error("Please upload an image file");
       return;
     }
     // For other modes, only allow PDFs
-    else if (mode !== "scan" && file.type !== "application/pdf") {
+    else if (mode !== "scan" && mode !== "barcode" && file.type !== "application/pdf") {
       toast.error("Only PDF files are supported for this mode");
       return;
     }
@@ -207,8 +221,11 @@ const ChatInputForm = ({
     setSelectedFile(file);
     setPreviewUrl(URL.createObjectURL(file));
 
-    // If in scan mode and no message, auto-submit
-    if (mode === "scan" && !form.getValues("chat")?.trim()) {
+    // If in scan or barcode mode and no message, auto-submit
+    if (
+      (mode === "scan" || mode === "barcode") &&
+      !form.getValues("chat")?.trim()
+    ) {
       form.handleSubmit(handleSubmit)();
     }
   };
@@ -223,6 +240,8 @@ const ChatInputForm = ({
 
   return (
     <div className="w-full max-w-3xl mx-auto px-4">
+      {/* Hidden container for html5-qrcode barcode reader */}
+      <div id="__qr-reader-hidden" className="hidden" />
       <Form {...form}>
         <form
           onSubmit={form.handleSubmit(handleSubmit)}
@@ -233,7 +252,7 @@ const ChatInputForm = ({
             <div className="relative w-full max-w-md border border-gray-200 dark:border-gray-700 bg-white dark:bg-[#2C2C2C] rounded-lg p-3">
               <div className="flex justify-between items-start gap-3">
                 <div className="flex items-start gap-3 flex-1 min-w-0">
-                  {mode === "scan" && previewUrl ? (
+                  {(mode === "scan" || mode === "barcode") && previewUrl ? (
                     <div className="flex-shrink-0 w-16 h-16 relative rounded-md overflow-hidden">
                       <Image
                         src={previewUrl}
@@ -249,9 +268,13 @@ const ChatInputForm = ({
                   )}
                   <div className="min-w-0 flex-1">
                     <p className="text-sm font-medium text-gray-900 dark:text-white">
-                      {mode === "scan" ? "Scanned Food" : selectedFile?.name}
+                      {mode === "scan"
+                        ? "Scanned Food"
+                        : mode === "barcode"
+                          ? "Barcode Image"
+                          : selectedFile?.name}
                     </p>
-                    {mode !== "scan" && (
+                    {mode !== "scan" && mode !== "barcode" && (
                       <p className="text-xs text-gray-500 dark:text-gray-400 mt-0.5">
                         {selectedFile?.size
                           ? `${(selectedFile.size / 1024).toFixed(1)} KB`
@@ -259,7 +282,8 @@ const ChatInputForm = ({
                       </p>
                     )}
                     <div className="mt-2 flex items-center gap-3">
-                      {mode === "scan" && form.getValues("chat") && (
+                      {(mode === "scan" || mode === "barcode") &&
+                      form.getValues("chat") && (
                         <>
                           <span className="text-sm text-gray-700 dark:text-gray-300">
                             {form.getValues("chat")}
@@ -292,7 +316,7 @@ const ChatInputForm = ({
                           </a>
                         </>
                       )}
-                      {mode !== "scan" && (
+                      {mode !== "scan" && mode !== "barcode" && (
                         <button
                           type="button"
                           className="text-xs text-blue-500 hover:underline flex items-center gap-1"
@@ -348,7 +372,9 @@ const ChatInputForm = ({
                           ? "Ask anything… or type @ to see Clark's magic commands..."
                           : mode === "search"
                             ? "Search for meals..."
-                            : "Take or upload a photo of food..."
+                            : mode === "barcode"
+                              ? "Upload a barcode or QR code image..."
+                              : "Take or upload a photo of food..."
                       }
                       {...field}
                       className="whitespace-pre-wrap min-h-[100px] max-h-[180px] text-[16px] max-w-[750px] font-medium p-3 w-full border-0 focus-visible:ring-0 focus-visible:ring-offset-0 rounded-none resize-none !bg-[#2C2C2C]"
@@ -357,7 +383,9 @@ const ChatInputForm = ({
                       <Tabs
                         value={mode}
                         onValueChange={(value) => {
-                          setMode(value as "ask" | "search" | "scan");
+                          setMode(
+                            value as "ask" | "search" | "scan" | "barcode",
+                          );
                           // Clear file when switching to search mode
                           if (value === "search" && selectedFile) {
                             removeFile();
@@ -383,6 +411,12 @@ const ChatInputForm = ({
                             className="data-[state=active]:bg-white dark:data-[state=active]:bg-[#FEF6E9] py-4 data-[state=active]:shadow-none rounded-md px-4 h-full text-sm font-medium dark:data-[state=active]:text-black data-[state=active]:text-[#FF3D00]"
                           >
                             Scan
+                          </TabsTrigger>
+                          <TabsTrigger
+                            value="barcode"
+                            className="data-[state=active]:bg-white dark:data-[state=active]:bg-[#FEF6E9] py-4 data-[state=active]:shadow-none rounded-md px-4 h-full text-sm font-medium dark:data-[state=active]:text-black data-[state=active]:text-[#FF3D00]"
+                          >
+                            Barcode
                           </TabsTrigger>
                         </TabsList>
                       </Tabs>
@@ -410,10 +444,14 @@ const ChatInputForm = ({
                             ref={fileInputRef}
                             onChange={handleFileChange}
                             accept={
-                              mode === "scan" ? "image/*" : "application/pdf"
+                              mode === "scan" || mode === "barcode"
+                                ? "image/*"
+                                : "application/pdf"
                             }
                             capture={
-                              mode === "scan" ? "environment" : undefined
+                              mode === "scan" || mode === "barcode"
+                                ? "environment"
+                                : undefined
                             }
                             className="hidden"
                           />

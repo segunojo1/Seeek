@@ -53,7 +53,7 @@ export const SpotlightedMeal = ({ meals = [] }: SpotlightedMealProps) => {
       </div>
       <div className='px-5 pb-5 mt-4'>
         <Link 
-          href={`/meals/${encodeURIComponent(meal_name.toLowerCase())}`} 
+          href={`/meal/${encodeURIComponent(meal_name.toLowerCase())}`} 
           className='text-[#F9E8CD] text-sm font-medium flex gap-1 items-center hover:opacity-80 transition-opacity w-fit'
         >
           View details <ChevronRight width={14} height={14} />
@@ -136,7 +136,7 @@ const MealCard = ({ meal_name, origin, description, health_score, key_benefits }
             ))}
           </div>
           <Link 
-            href={`/meals/${encodeURIComponent(meal_name.toLowerCase())}`} 
+            href={`/meal/${encodeURIComponent(meal_name.toLowerCase())}`} 
             className='text-[#F9E8CD] text-sm font-medium flex gap-1 items-center mt-auto self-start hover:opacity-80 transition-opacity'
           >
             View details <ChevronRight width={14} height={14} />
