@@ -263,14 +263,15 @@ const SignUpPage = () => {
   const handleUserGoalsSubmit = async (values: UserGoalsFormValues) => {
     try {
       setIsLoading(true);
-      if (!signupData.userId) throw new Error("User ID not found");
+      if (!signupData.Email) throw new Error("Email not found");
 
-      // Combine all the data with proper type assertions
-      const profileData = {
+      // Combine all the data for completeSignup
+      const payload = {
+        email: signupData.Email,
         dateOfBirth: signupData.dateOfBirth as string,
         gender: signupData.gender as string,
-        height: Number(signupData.height) || 0,
-        weight: Number(signupData.weight) || 0,
+        height: `${signupData.height}cm`,
+        weight: `${signupData.weight}kg`,
         skinType: signupData.skinType as string,
         nationality: signupData.nationality as string,
         dietType: signupData.dietType as string,
@@ -278,14 +279,12 @@ const SignUpPage = () => {
         userGoals: values.userGoals,
       };
 
-      // Create the profile
-      await authService.createProfile(signupData.userId, profileData);
+      // Complete the signup
+      await authService.completeSignup(payload);
 
       // Reset the signup flow and redirect to dashboard
       resetSignup();
-      console.log("before route");
       router.push("/home");
-      console.log("after route");
     } catch (error) {
       console.error("Profile creation error:", error);
       throw error; // Re-throw to show error in the form

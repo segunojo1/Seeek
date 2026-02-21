@@ -56,6 +56,19 @@ export interface ProfilePayload {
   userGoals: string[];
 }
 
+export interface CompleteSignupPayload {
+  email: string;
+  dateOfBirth: string;
+  gender: string;
+  height: string;
+  weight: string;
+  skinType: string;
+  nationality: string;
+  dietType: string;
+  allergies: string[];
+  userGoals: string[];
+}
+
 export interface OtpResponse {
   message: string;
   success: boolean;
@@ -278,25 +291,21 @@ class AuthService {
     }
   }
 
-  public async createProfile(
-    userId: string,
-    profileData: ProfilePayload,
-  ): Promise<Profile> {
+  public async completeSignup(payload: CompleteSignupPayload): Promise<Profile> {
     try {
       const response = await this.api.post<Profile>(
-        `/api/Profile/create?userId=${userId}`,
-        profileData,
+        '/api/v1/completeSignup',
+        payload,
       );
-      // Store profile ID in cookies after successful profile creation
       if (response.data?.id) {
         Cookies.set("profileID", response.data.id, this.COOKIE_OPTIONS);
       }
       return response.data;
     } catch (error: any) {
-      console.error("Profile creation failed:", error);
+      console.error("Complete signup failed:", error);
       throw new Error(
         error.response?.data?.message ||
-          "Profile creation failed. Please try again.",
+          "Failed to complete signup. Please try again.",
       );
     }
   }

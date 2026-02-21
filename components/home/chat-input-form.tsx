@@ -10,6 +10,7 @@ import { Button } from "../ui/button"
 import { Textarea } from "../ui/textarea"
 import { X, FileText,  Mic, MicOff } from "lucide-react"
 import { useChatStore } from "@/store/chat.store"
+import { useScanStore } from "@/store/scan.store"
 import { toast } from "sonner"
 import { Tabs, TabsList, TabsTrigger } from "../ui/tabs"
 import Image from "next/image"
@@ -141,6 +142,7 @@ const ChatInputForm = ({
   })
 
   const { isLoading } = useChatStore()
+  const { scanImage, isScanning } = useScanStore()
 
   const handleSubmit = async (values: z.infer<typeof chatSchema>) => {
     const message = values.chat.trim()
@@ -153,8 +155,13 @@ const ChatInputForm = ({
         router.push(`/meals/${encodeURIComponent(message)}`)
         return
       } else if (mode === 'scan' && selectedFile) {
-        // For scan mode, handle the image file
-        onSend('', selectedFile)
+        // For scan mode, call the image scan API then navigate to results
+        const result = await scanImage(selectedFile)
+        if (result) {
+          router.push('/meal/scan')
+        } else {
+          toast.error('Failed to analyze the image. Please try again.')
+        }
       } else {
         // For ask mode or when there's no file in scan mode
         onSend(message, selectedFile || undefined)
@@ -165,7 +172,7 @@ const ChatInputForm = ({
       setPreviewUrl('')
     } catch (error) {
       console.error('Error:', error)
-      toast.error(`Failed to ${mode === 'search' ? 'search' : 'send message'}`)
+      toast.error(`Failed to ${mode === 'search' ? 'search' : mode === 'scan' ? 'scan image' : 'send message'}`)
     }
   }
 
@@ -445,9 +452,9 @@ const ChatInputForm = ({
                           type="submit"
                           size="icon"
                           className="h-8 w-8 rounded-full bg-[#262626] hover:bg-[#FF3D00]/90"
-                          disabled={disabled || isLoading}
+                          disabled={disabled || isLoading || isScanning}
                         >
-                          {isLoading ? (
+                          {isLoading || isScanning ? (
                             <Loader className="h-4 w-4 text-[#ffffff] animate-spin" />
                           ) : (
                             <ArrowUp className="h-4 w-4 text-[#ffffff]" />

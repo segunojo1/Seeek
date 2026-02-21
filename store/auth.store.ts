@@ -5,8 +5,6 @@ export interface SignupState extends Omit<SignupPayload, 'password' | 'confirmPa
   password?: string;
   confirmPassword?: string;
   currentStep: number;
-  emailVerified: boolean;
-  otp?: string;
   userId?: string;
   profileId?: string;
 }
@@ -23,7 +21,6 @@ interface AuthStore {
 
 const STEPS = [
   'signup',
-  'verify-email',
   'biodata',
   'diet-type',
   'allergies',
@@ -39,7 +36,6 @@ const useAuthStore = create<AuthStore>((set) => ({
     Password: '',
     ConfirmPassword: '',
     currentStep: 0,
-    emailVerified: false,
     dateOfBirth: '',
     gender: '',
     height: 0,
@@ -84,7 +80,6 @@ const useAuthStore = create<AuthStore>((set) => ({
         Password: '',
         ConfirmPassword: '',
         currentStep: 0,
-        emailVerified: false,
         dateOfBirth: '',
         gender: '',
         height: 0,

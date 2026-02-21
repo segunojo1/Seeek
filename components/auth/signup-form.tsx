@@ -53,8 +53,11 @@ const SignUpForm = ({ form, onSubmit }: SignUpFormProps) => {
         currentStep: 1,
       });
 
-      // Send OTP
-      // await authService.sendOtp(values.Email, `${values.FirstName} ${values.LastName}`);
+      // Send OTP after successful registration
+      await authService.sendOtp(
+        values.Email,
+        `${values.FirstName} ${values.LastName}`,
+      );
 
       onSubmit(values);
     } catch (error: any) {
