@@ -7,12 +7,12 @@ Seek is an AI-powered health companion built by Team Dimroid that provides perso
 
 ## What Seek Does
 
-- **Food Analysis** - Analyse food items and get personalised nutritional guidance based on your health profile
-- **Drug Verification** - Check if a medication is safe for you based on your history and allergies
-- **AI Health Chat** - Conversational AI powered by Gemini that answers health questions personalised to you
-- **WhatsApp Bot** - Chat with Seek directly on WhatsApp and get instant health answers on the go
-- **Health Dashboard** - View your personalised insights, recommendations and history in one place
-- **Chat History** - Every WhatsApp conversation is saved and accessible via your personal link
+1) **Food Analysis** - Analyse food items and get personalised nutritional guidance based on your health profile
+2) **Drug Verification** - Check if a medication is safe for you based on your history and allergies
+3) **AI Health Chat** - Conversational AI powered by Gemini that answers health questions personalised to you
+4) **WhatsApp Bot** - Chat with Seek directly on WhatsApp and get instant health answers on the go
+5) **Health Dashboard** - View your personalised insights, recommendations and history in one place
+6) **Chat History** - Every WhatsApp conversation is saved and accessible via your personal link
 
 
 - **Food Analysis** — Snap or search any food item and Seek analyses its nutritional content. Based on your health profile, allergies and goals, it tells you whether that food works for you and why — not just generic nutrition facts, but advice tailored to you.
