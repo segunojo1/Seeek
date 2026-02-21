@@ -1,67 +1,47 @@
-### Product Requirements Document (PRD) for Seek
+# Seek
+## AI-Powered Preventive Health Platform
 
-#### 1. Product Overview
-Seek, developed by Team Dimroid is an AI-powered preventive health platform that provides personalized recommendations based on user's health history. It takes users information, analyzes it and produce Health improvement recommend
+Seek is an AI-powered health companion built by Team Dimroid that provides personalised health recommendations based on your profile, family history, food habits, and medication usage.
 
-**Key Differentiators:**
-- Family-history-driven recommendations that consider hereditary risks and patterns.
-- AI-powered drug verification that flags potential issues without prescribing.
-- Focus on preventive health through personalized food and medication guidance.
+---
 
-**Mission:** Empower users with AI-driven health insights based on their family's medical history, promoting preventive healthcare decisions.
+## What Seek Does
 
-**Scope:** MVP launch with core authentication, food recommendations, and drug verification features.
+- **Food Analysis** — Analyse food items and get personalised nutritional guidance based on your health profile
+- **Drug Verification** — Check if a medication is safe for you based on your history and allergies
+- **AI Health Chat** — Conversational AI powered by Gemini that answers health questions personalised to you
+- **WhatsApp Bot** — Chat with Seek directly on WhatsApp and get instant health answers on the go
+- **Family Health Profile** — Add family members and their conditions to get hereditary risk-aware recommendations
+- **Health Dashboard** — View your personalised insights, recommendations and history in one place
+- **Chat History** — Every WhatsApp conversation is saved and accessible via your personal link
 
-#### 2. Target Audience
-- **Primary Users:** Health-conscious individuals seeking personalized preventive health guidance based on family history.
-- **Secondary Users:** Families wanting to track and understand hereditary health patterns.
-- **Demographics:** Adults aged 25-55 concerned about preventive health, urban and semi-urban areas with access to digital health tools.
+---
 
-#### 3. Goals and Objectives
-- **Business Goals:** Establish Seek as a trusted AI health companion. Generate revenue through freemium model with premium features.
-- **User Goals:** Users receive personalized food and drug recommendations based on family health history.
-- **Success Factors:**
-  - **User Adoption:** Social media campaigns and health community partnerships.
-  - **Trust and Safety:** Clear disclaimers and professional consultation recommendations.
-  - **Accuracy:** High-quality AI responses based on established health knowledge.
-  - **Privacy:** Secure handling of sensitive family health data.
-  - **Metrics for Success:** 15% MoM growth, positive user feedback on recommendation accuracy.
+## Tech Stack
 
-#### 4. Key Features
-Focus on core preventive health features with family history integration.
+| Layer | Technology |
+|---|---|
+| Web Frontend | Next.js |
+| Backend API | Node.js / Express.js |
+| WhatsApp Bot | Python / FastAPI |
+| AI Model | Google Gemini API |
+| Database | PostgreSQL |
+| WhatsApp Gateway | Twilio |
 
-**Core Features (MVP):**
-- **User Authentication:** Sign-up/login via email. Secure user profiles.
-- **Family Health Profile:** Add family members and their health conditions, allergies, and medical history.
-- **Food Recommendations:** AI-powered suggestions for healthy eating based on family risk factors (e.g., low-sodium options for hypertension history).
-- **Drug Verifier:** Check if medications are safe based on family history (e.g., "No, given your family history of ulcers, this drug may irritate your stomach").
-- **Health Dashboard:** View personalized insights and recommendations.
+---
 
-**Enhanced Features (Post-MVP):**
-- **Risk Assessment:** Detailed hereditary risk analysis.
-- **Health Chat:** AI conversation for health questions with family context.
-- **Report Export:** PDF summaries of health recommendations.
+## Getting Started
 
-**Non-Functional Requirements:**
-- **Performance:** Fast response times for AI recommendations.
-- **Security:** Encrypted health data storage and privacy protection.
+Visit [seekapp.com](https://seekapp.com) to create your account and get started.
 
-#### 5. User Stories
-- As a user, I want to create a family health profile so I can track hereditary patterns.
-- As a user, I want food recommendations based on my family's health history so I can eat preventively.
-- As a user, I want to verify if a drug is safe for me based on family history so I can avoid potential risks.
-- As a user, I want clear disclaimers reminding me to consult professionals so I understand limitations.
+To use the WhatsApp bot, simply message our Seek WhatsApp number and start asking health questions instantly.
 
-#### 6. Technical Requirements
-- **Backend:** Express.js (Node.js) for APIs, authentication, and data management.
-- **Frontend:** Next.js for dynamic UI and user interactions.
-- **AI Integration:** Google Gemini API for health recommendations and drug verification.
-- **Database:** Secure storage for user profiles and family health data.
-- **Deployment:** Cloud hosting with scalability considerations.
-- **Testing:** Unit tests for backend and frontend components.
+---
 
-#### 7. Potential Challenges and Mitigations
-- **Data Privacy:** Implement strong encryption and compliance with health data regulations.
-- **AI Accuracy:** Include clear disclaimers and recommend professional consultation.
-- **User Trust:** Build credibility through transparent AI usage and medical disclaimers.
-- **Adoption:** Focus on user education about preventive health benefits.
+## Disclaimer
+
+Seek provides general health information only. It is not a substitute for professional medical advice, diagnosis or treatment. Always consult a qualified healthcare professional before making health decisions.
+
+---
+
+Built with 🩺 by Team Dimroid
