@@ -1,10 +1,12 @@
 from fastapi import FastAPI
 from routers import router
 from database import Base, engine
+from webhook import router as webhook_router
 
 
 app = FastAPI()
 app.include_router(router)
+app.include_router(webhook_router)
 
  
 @app.on_event("startup")
