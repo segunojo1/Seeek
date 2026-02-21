@@ -1,7 +1,7 @@
 ### Product Requirements Document (PRD) for Seek
 
 #### 1. Product Overview
-Seek, developed by Team Dimroid is an AI-powered preventive health platform that provides personalized recommendations based on family health history. It uses Gemini AI to analyze hereditary patterns and deliver context-aware guidance on food choices and medication safety, helping users make informed health decisions. The platform uses Express.js for a secure backend and Next.js for a responsive frontend, enabling users to build family health profiles and receive intelligent health insights.
+Seek, developed by Team Dimroid is an AI-powered preventive health platform that provides personalized recommendations based on user's health history. It takes users information, analyzes it and produce Health improvement recommend
 
 **Key Differentiators:**
 - Family-history-driven recommendations that consider hereditary risks and patterns.
