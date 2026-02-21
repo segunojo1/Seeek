@@ -17,7 +17,7 @@ Seek is an AI-powered health companion built by Team Dimroid that provides perso
 
 
 
-- **Food Analysis** — Snap or search any food item and Seek analyses its nutritional content. Based on your health profile, allergies and goals, it tells you whether that food works for you and why — not just generic nutrition facts, but advice tailored to you.
+- **Food Analysis** - Snap or search any food item and Seek analyses its nutritional content. Based on your health profile, allergies and goals, it tells you whether that food works for you and why — not just generic nutrition facts, but advice tailored to you.
 
 - **Drug Verification** - Before taking any medication, run it through Seek. It checks the drug against your health history, family conditions and known allergies to flag any potential risks. Not a prescription — just a smart second opinion before you swallow something.
 
