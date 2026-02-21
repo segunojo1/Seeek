@@ -11,7 +11,6 @@ Seek is an AI-powered health companion built by Team Dimroid that provides perso
 - **Drug Verification** — Check if a medication is safe for you based on your history and allergies
 - **AI Health Chat** — Conversational AI powered by Gemini that answers health questions personalised to you
 - **WhatsApp Bot** — Chat with Seek directly on WhatsApp and get instant health answers on the go
-- **Family Health Profile** — Add family members and their conditions to get hereditary risk-aware recommendations
 - **Health Dashboard** — View your personalised insights, recommendations and history in one place
 - **Chat History** — Every WhatsApp conversation is saved and accessible via your personal link
 
