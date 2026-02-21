@@ -14,6 +14,7 @@ import { Button } from "../ui/button";
 // import authService from "@/services/auth.service";
 import { useRouter } from "next/navigation";
 import { AppSidebar } from "../app-sidebar";
+import authService from "@/services/auth.service";
 
 export default function ClientLayout({
     children,
@@ -22,10 +23,10 @@ export default function ClientLayout({
 }) {
     const { setTheme } = useTheme()
     const route = useRouter()
-    // const logout = () => {
-    //     authService.logout();
-    //     route.push("/auth/login")
-    // }
+    const logout = () => {
+        authService.logout();
+        route.push("/auth/login")
+    }
     return (
         <SidebarProvider defaultOpen={true} >
             <AppSidebar />
@@ -36,6 +37,7 @@ export default function ClientLayout({
                     <Button
                         variant="outline"
                         size="icon"
+                        onClick={logout}
                     >
                         Logout
                     </Button>
