@@ -19,7 +19,6 @@ import {
   UserGoalsFormValues,
 } from "@/models/validations/auth.validation";
 import SignUpForm from "@/components/auth/signup-form";
-import VerifyEmail from "@/components/auth/verify-email";
 import Biodata from "@/components/auth/biodata";
 import DietType from "@/components/auth/diet-type";
 import Allergies from "@/components/auth/allergies";
@@ -27,7 +26,6 @@ import UserGoals from "@/components/auth/user-goals";
 import { motion, AnimatePresence } from "framer-motion";
 import {
   SignUpFormProps,
-  VerifyEmailProps,
   BiodataProps,
   DietTypeProps,
   AllergiesProps,
@@ -43,7 +41,7 @@ const variants = {
     y: 0,
     opacity: 1,
     transition: {
-      type: "spring",
+      type: "spring" as const,
       damping: 30,
       stiffness: 100,
     },
@@ -52,7 +50,7 @@ const variants = {
     y: direction < 0 ? 600 : -600,
     opacity: 0,
     transition: {
-      type: "spring",
+      type: "spring" as const,
       damping: 30,
       stiffness: 100,
     },
@@ -111,18 +109,6 @@ const SignUpPage = () => {
     }
   }, [signupData.currentStep]);
 
-  // Move to the next step after OTP verification
-  const handleOtpVerificationSuccess = (code?: string) => {
-    if (code) {
-      handleVerifyEmail(code).then(() => {
-        // Only proceed to next step if verification is successful
-        handleNextStep();
-      });
-    } else {
-      handleNextStep();
-    }
-  };
-
   const handlePrevStep = () => {
     setDirection(-1);
     setPrevStepNum(currentStep);
@@ -136,6 +122,7 @@ const SignUpPage = () => {
       FirstName: signupData.FirstName || "",
       LastName: signupData.LastName || "",
       Email: signupData.Email || "",
+      PhoneNumber: signupData.PhoneNumber || "",
       Password: signupData.Password || "",
       ConfirmPassword: signupData.ConfirmPassword || "",
     },
@@ -181,53 +168,13 @@ const SignUpPage = () => {
       // Store the form data in the store
       updateSignupData({
         ...values,
-        currentStep: STEPS.indexOf(SIGNUP_STEPS.VERIFY_EMAIL),
-      });
-
-      // Send OTP to the user's email
-      await authService.sendOtp(
-        values.Email,
-        `${values.FirstName} ${values.LastName}`,
-      );
-
-      // Move to the verify email step
-      handleNextStep();
-    } catch (error: any) {
-      toast.error(error.message || "Failed to send OTP");
-    } finally {
-      setIsLoading(false);
-    }
-  };
-
-  // Handle OTP verification
-  const handleVerifyEmail = async (code: string): Promise<void> => {
-    if (!signupData.Email) {
-      throw new Error("Email is required for OTP verification");
-    }
-
-    try {
-      setIsLoading(true);
-
-      // Verify the OTP using the auth service
-      const response = await authService.verifyOtp(signupData.Email, code);
-
-      // Update the signup data with the verification status
-      updateSignupData({
-        ...signupData,
-        userId: response.user?.id || signupData.userId,
-        emailVerified: true,
-        otp: code,
         currentStep: STEPS.indexOf(SIGNUP_STEPS.BIODATA),
       });
 
-      // Move to the next step
-      router.push("/auth/login");
-
-      return Promise.resolve();
+      // Move to the biodata step
+      handleNextStep();
     } catch (error: any) {
-      console.error("OTP verification error:", error);
-      toast.error(error.message || "Failed to verify OTP");
-      return Promise.reject(error);
+      toast.error(error.message || "Failed to proceed");
     } finally {
       setIsLoading(false);
     }
@@ -316,25 +263,6 @@ const SignUpPage = () => {
             onSubmit={handleSignupSubmit}
           />
         );
-      case SIGNUP_STEPS.VERIFY_EMAIL:
-        return (
-          <VerifyEmail
-            key={SIGNUP_STEPS.VERIFY_EMAIL}
-            email={signupData.Email || ""}
-            onSuccess={async (code) => {
-              if (code) {
-                try {
-                  await handleVerifyEmail(code);
-                  handleNextStep();
-                } catch (error) {
-                  // Error is already handled in handleVerifyEmail
-                }
-              } else {
-                toast.error("Verification code is required");
-              }
-            }}
-          />
-        );
       case SIGNUP_STEPS.BIODATA:
         return (
           <Biodata
@@ -375,7 +303,7 @@ const SignUpPage = () => {
     }
   };
 
-  const showSidebar = ["signup", "verify-email"].includes(currentStepName);
+  const showSidebar = ["signup"].includes(currentStepName);
 
   return (
     <AuthClientLayout showSidebar={showSidebar} currentStep={currentStepName}>

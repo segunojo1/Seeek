@@ -8,16 +8,27 @@ export interface RegisterPayload {
   lastName: string;
   email: string;
   password: string;
+  phone_number?: string;
 }
 
 export interface User {
-  id: string;
+  id: number;
   firstName: string;
   lastName: string;
   email: string;
-  isEmailVerified: boolean;
-  dateCreated: string;
-  dateModified: string | null;
+  phone_number?: string;
+  oauth?: string;
+  oauth_method?: string;
+  dateOfBirth?: string;
+  gender?: string;
+  height?: string;
+  weight?: string;
+  skinType?: string;
+  nationality?: string;
+  dietType?: string;
+  allergies?: string[];
+  userGoals?: string[];
+  account_completed?: boolean;
 }
 
 export interface Profile {
@@ -37,11 +48,11 @@ export interface Profile {
 }
 
 export interface SignupPayload {
-  FirstName: string;
-  LastName: string;
-  Email: string;
-  Password: string;
-  ConfirmPassword?: string;
+  firstName: string;
+  lastName: string;
+  email: string;
+  password: string;
+  phone_number?: string;
 }
 
 export interface ProfilePayload {
@@ -69,19 +80,6 @@ export interface CompleteSignupPayload {
   userGoals: string[];
 }
 
-export interface OtpResponse {
-  message: string;
-  success: boolean;
-  userId?: string;
-  token?: string;
-  user?: User;
-}
-
-export interface VerifyOtpPayload {
-  email: string;
-  otp: string;
-}
-
 class AuthService {
   private api: AxiosInstance;
   private static instance: AuthService;
@@ -107,8 +105,7 @@ class AuthService {
         const isAuthEndpoint = [
           "/api/v1/signup",
           "/api/v1/login",
-          "/api/v1/otp",
-          "/api/v1/verifyOTP",
+          "/api/v1/completeSignup",
         ].some((endpoint) => config.url?.includes(endpoint));
 
         if (!isAuthEndpoint) {
@@ -217,57 +214,6 @@ class AuthService {
     }
   }
 
-  public async sendOtp(email: string, name: string): Promise<OtpResponse> {
-    try {
-      const response = await this.api.post<OtpResponse>("/api/v1/otp", {
-        email,
-        name,
-      });
-      return response.data;
-    } catch (error: any) {
-      console.error("Error sending OTP:", error);
-      const errorMessage =
-        error.response?.data?.message ||
-        "Failed to send OTP. Please try again.";
-      throw new Error(errorMessage);
-    }
-  }
-
-  public async verifyOtp(email: string, otp: string): Promise<OtpResponse> {
-    try {
-      const response = await this.api.post<OtpResponse>("/api/v1/verifyOTP", {
-        email,
-        otp,
-      });
-
-      if (response.data.token) {
-        // Store the token and update the auth header
-        Cookies.set("token", response.data.token, this.COOKIE_OPTIONS);
-        this.api.defaults.headers.common["Authorization"] =
-          `Bearer ${response.data.token}`;
-
-        // If user data is included in the response, store it as well
-        if (response.data.user) {
-          Cookies.set(
-            "user",
-            JSON.stringify(response.data.user),
-            this.COOKIE_OPTIONS,
-          );
-          useUserStore.getState().setUser(response.data.user);
-        }
-      }
-
-      return response.data;
-    } catch (error: any) {
-      const errorMessage =
-        error.response?.data?.message ||
-        error.message ||
-        "OTP verification failed";
-      console.error("OTP verification failed:", errorMessage);
-      throw new Error(errorMessage);
-    }
-  }
-
   public async register(payload: SignupPayload): Promise<{
     message: string;
     success: boolean;
@@ -291,10 +237,12 @@ class AuthService {
     }
   }
 
-  public async completeSignup(payload: CompleteSignupPayload): Promise<Profile> {
+  public async completeSignup(
+    payload: CompleteSignupPayload,
+  ): Promise<Profile> {
     try {
       const response = await this.api.post<Profile>(
-        '/api/v1/completeSignup',
+        "/api/v1/completeSignup",
         payload,
       );
       if (response.data?.id) {
@@ -333,20 +281,20 @@ class AuthService {
   public async login(
     email: string,
     password: string,
-  ): Promise<{ user: User; token: string; value: any }> {
+  ): Promise<{ success: boolean; message: string; user: User; token: string }> {
     try {
       const response = await this.api.post<{
+        success: boolean;
+        message: string;
         token: string;
         user: User;
-        value?: any;
-        message?: string;
       }>("/api/v1/login", {
         email,
         password,
       });
 
       if (response.data.token) {
-        const { token, user, value } = response.data;
+        const { token, user } = response.data;
 
         Cookies.set("token", token, this.COOKIE_OPTIONS);
         if (user) {
@@ -354,7 +302,7 @@ class AuthService {
         }
         this.api.defaults.headers.common["Authorization"] = `Bearer ${token}`;
 
-        return { user, token, value };
+        return response.data;
       }
 
       throw new Error("No token received");

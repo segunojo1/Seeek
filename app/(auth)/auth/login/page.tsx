@@ -10,7 +10,6 @@ import { z } from "zod"
 import { toast } from "sonner"
 import authService from "@/services/auth.service"
 import { useState } from "react"
-import Cookies from "js-cookie"
 import Link from "next/link"
 import { zodResolver } from "@hookform/resolvers/zod"
 import AuthClientLayout from "@/components/layout/auth-layout"
@@ -39,45 +38,14 @@ const LoginForm = () => {
     try {
       setIsLoading(true);
       
-      const response = await authService.login(values.email, values.password) as {
-        user: any;
-        token: string;
-        value: {
-          isProfileExist: boolean;
-          [key: string]: any;
-        };
-      };
-      
-      const { user, value } = response;
+      const response = await authService.login(values.email, values.password);
       
       // Update user in the store
       const userStore = useUserStore.getState();
-      userStore.setUser(user);
+      userStore.setUser(response.user);
       
-      // Redirect based on profile status
-      if (value?.isProfileExist) {
-        try {
-          // Fetch profile ID for the user
-          const profileResponse = await authService.getProfileByUserId(user.id);
-          if (profileResponse?.value) {
-            // Store profile ID in cookies
-            Cookies.set('profileID', profileResponse.value.toString(), {
-              secure: process.env.NODE_ENV === 'production',
-              sameSite: 'lax',
-              path: '/',
-              expires: 7 // 7 days
-            });
-          }
-          route.push('/home');
-        } catch (error) {
-          console.error('Error fetching profile:', error);
-          // Still redirect to home even if profile fetch fails
-          route.push('/home');
-        }
-      } else {
-        // Redirect to signup page with step=3 (BIODATA)
-        route.push('/auth/signup?step=3');
-      }
+      // Redirect to home
+      route.push('/home');
     } catch (error: any) {
       toast.error(error.message || 'Failed to login')
     } finally {

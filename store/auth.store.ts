@@ -1,9 +1,13 @@
-import { create } from 'zustand';
-import { User, SignupPayload, ProfilePayload } from '@/services/auth.service';
+import { create } from "zustand";
+import { User, ProfilePayload } from "@/services/auth.service";
 
-export interface SignupState extends Omit<SignupPayload, 'password' | 'confirmPassword'>, Partial<ProfilePayload> {
-  password?: string;
-  confirmPassword?: string;
+export interface SignupState extends Partial<ProfilePayload> {
+  FirstName: string;
+  LastName: string;
+  Email: string;
+  PhoneNumber?: string;
+  Password: string;
+  ConfirmPassword: string;
   currentStep: number;
   userId?: string;
   profileId?: string;
@@ -20,77 +24,79 @@ interface AuthStore {
 }
 
 const STEPS = [
-  'signup',
-  'biodata',
-  'diet-type',
-  'allergies',
-  'user-goals'
+  "signup",
+  "biodata",
+  "diet-type",
+  "allergies",
+  "user-goals",
 ] as const;
 
 const useAuthStore = create<AuthStore>((set) => ({
   user: null,
   signupData: {
-    FirstName: '',
-    LastName: '',
-    Email: '',
-    Password: '',
-    ConfirmPassword: '',
+    FirstName: "",
+    LastName: "",
+    Email: "",
+    PhoneNumber: "",
+    Password: "",
+    ConfirmPassword: "",
     currentStep: 0,
-    dateOfBirth: '',
-    gender: '',
+    dateOfBirth: "",
+    gender: "",
     height: 0,
     weight: 0,
-    skinType: '',
-    nationality: '',
-    dietType: '',
+    skinType: "",
+    nationality: "",
+    dietType: "",
     allergies: [],
-    userGoals: []
+    userGoals: [],
   },
   setUser: (user) => set({ user }),
-  updateSignupData: (data) => 
+  updateSignupData: (data) =>
     set((state) => ({
-      signupData: { ...state.signupData, ...data }
+      signupData: { ...state.signupData, ...data },
     })),
-  nextStep: () => 
+  nextStep: () =>
     set((state) => {
       const currentStep = state.signupData.currentStep || 0;
       return {
-        signupData: { 
-          ...state.signupData, 
-          currentStep: Math.min(currentStep + 1, STEPS.length - 1) 
-        }
+        signupData: {
+          ...state.signupData,
+          currentStep: Math.min(currentStep + 1, STEPS.length - 1),
+        },
       };
     }),
-  prevStep: () => 
+  prevStep: () =>
     set((state) => {
       const currentStep = state.signupData.currentStep || 1;
       return {
-        signupData: { 
-          ...state.signupData, 
-          currentStep: Math.max(currentStep - 1, 0) 
-        }
+        signupData: {
+          ...state.signupData,
+          currentStep: Math.max(currentStep - 1, 0),
+        },
       };
     }),
-  resetSignup: () => 
+  resetSignup: () =>
     set({
       signupData: {
-        FirstName: '',
-        LastName: '',
-        Email: '',
-        Password: '',
-        ConfirmPassword: '',
+        FirstName: "",
+        LastName: "",
+        Email: "",
+        PhoneNumber: "",
+        Password: "",
+        ConfirmPassword: "",
         currentStep: 0,
-        dateOfBirth: '',
-        gender: '',
+        dateOfBirth: "",
+        gender: "",
         height: 0,
         weight: 0,
-        skinType: '',
-        nationality: '',
-        dietType: '',
+        skinType: "",
+        nationality: "",
+        dietType: "",
         allergies: [],
-        userGoals: []
-      }
-    })
+        userGoals: [],
+      },
+    }),
 }));
 
 export default useAuthStore;

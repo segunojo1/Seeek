@@ -2,16 +2,18 @@ import axios, { AxiosInstance } from "axios";
 import Cookies from "js-cookie";
 
 export interface MealRecommendation {
-  $id: string;
-  name: string;
-  course: string;
+  meal_name: string;
+  origin: string;
   description: string;
-  imageUrl?: string;
+  health_score: number;
+  key_benefits: string[];
+  why_it_fits: string;
 }
 
 export interface MealRecommendationsResponse {
-  $id: string;
-  $values: MealRecommendation[];
+  response: {
+    recommendations: MealRecommendation[];
+  };
 }
 
 export interface BlogPost {
@@ -136,42 +138,38 @@ export class ProductService {
     return ProductService.instance;
   }
 
-  private getProfileId(): string {
-    const profileId = Cookies.get("profileID");
-    if (!profileId) {
-      throw new Error("Profile ID not found in cookies");
-    }
-    return profileId;
-  }
-
   public async getRecommendedMeals(): Promise<MealRecommendation[]> {
     try {
-      const profileId = this.getProfileId();
       const response = await this.api.get<MealRecommendationsResponse>(
-        "/api/MealRecommendation/GenerateMeals",
-        {
-          params: { profileId },
-        },
+        "/api/v1/recommendMeals",
       );
-      return response.data?.$values || [];
+      return response.data?.response?.recommendations || [];
     } catch (error) {
       console.error("Error fetching recommended meals:", error);
       return [];
     }
   }
 
-  public async generateMealPlan(): Promise<MealPlan | null> {
-    try {
-      const profileId = this.getProfileId();
-      const response = await this.api.get("/api/MealPlan/GenMeal", {
-        params: { profileId },
-      });
-      return response.data || null;
-    } catch (error) {
-      console.error("Error generating meal plan:", error);
-      return null;
-    }
-  }
+  // private getProfileId(): string {
+  //   const profileId = Cookies.get("profileID");
+  //   if (!profileId) {
+  //     throw new Error("Profile ID not found in cookies");
+  //   }
+  //   return profileId;
+  // }
+
+  // public async generateMealPlan(): Promise<MealPlan | null> {
+  //   try {
+  //     const profileId = this.getProfileId();
+  //     const response = await this.api.get("/api/MealPlan/GenMeal", {
+  //       params: { profileId },
+  //     });
+  //     return response.data || null;
+  //   } catch (error) {
+  //     console.error("Error generating meal plan:", error);
+  //     return null;
+  //   }
+  // }
 
   public async getAllBlogs(): Promise<BlogPost[]> {
     try {

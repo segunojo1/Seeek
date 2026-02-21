@@ -35,7 +35,6 @@ const SignUpForm = ({ form, onSubmit }: SignUpFormProps) => {
       // Save initial signup data to store
       updateSignupData({
         ...values,
-        emailVerified: false,
       });
 
       // Call the register API
@@ -44,6 +43,7 @@ const SignUpForm = ({ form, onSubmit }: SignUpFormProps) => {
         lastName: values.LastName,
         email: values.Email,
         password: values.Password,
+        phone_number: values.PhoneNumber || undefined,
       });
 
       // Update store with user data from the response (if available)
@@ -52,12 +52,6 @@ const SignUpForm = ({ form, onSubmit }: SignUpFormProps) => {
         Email: values.Email,
         currentStep: 1,
       });
-
-      // Send OTP after successful registration
-      await authService.sendOtp(
-        values.Email,
-        `${values.FirstName} ${values.LastName}`,
-      );
 
       onSubmit(values);
     } catch (error: any) {
@@ -116,6 +110,23 @@ const SignUpForm = ({ form, onSubmit }: SignUpFormProps) => {
                   <PrimaryInput
                     type="email"
                     placeholder="you@example.com"
+                    {...field}
+                  />
+                </FormControl>
+                <FormMessage />
+              </FormItem>
+            )}
+          />
+          <FormField
+            control={form.control}
+            name="PhoneNumber"
+            render={({ field }) => (
+              <FormItem>
+                <FormLabel className="font-medium">Phone Number </FormLabel>
+                <FormControl>
+                  <PrimaryInput
+                    type="tel"
+                    placeholder="Enter your phone number"
                     {...field}
                   />
                 </FormControl>

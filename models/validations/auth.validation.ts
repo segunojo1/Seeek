@@ -11,6 +11,9 @@ export const signupSchema = z.object({
   Email: z.string().email({
     message: "Please enter a valid email address.",
   }),
+  PhoneNumber: z.string().min(10, {
+    message: "Phone number must be at least 10 characters.",
+  }),
   Password: z.string()
     .min(8, {
       message: "Password must be at least 8 characters.",
@@ -112,6 +115,7 @@ export interface SignupFormValues {
   FirstName: string;
   LastName: string;
   Email: string;
+  PhoneNumber: string;
   Password: string;
   ConfirmPassword: string;
 }

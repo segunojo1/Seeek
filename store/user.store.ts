@@ -1,12 +1,6 @@
 import { create } from 'zustand';
 import { persist, createJSONStorage } from 'zustand/middleware';
-
-type User = {
-  id: string;
-  email: string;
-  name?: string;
-  // Add other user properties as needed
-};
+import { User } from '@/services/auth.service';
 
 type UserStore = {
   user: User | null;

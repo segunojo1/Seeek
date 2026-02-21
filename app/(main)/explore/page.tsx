@@ -32,9 +32,6 @@ const Explore = () => {
   const featuredMeal = recommendedMeals.length > 0 
     ? recommendedMeals[Math.floor(Math.random() * recommendedMeals.length)] 
     : null;
-
-  // Filter meals for the meals tab
-  const mealsTabContent = recommendedMeals.filter(meal => meal.course === 'Main');
   
   return (
     <section className="satoshi p-4 max-w-[1086px] mx-auto">
@@ -119,13 +116,14 @@ const Explore = () => {
                   <Skeleton key={i} className="w-full h-[300px] rounded-[20px] bg-white" />
                 ))
               ) : recommendedMeals.length > 0 ? (
-                recommendedMeals.slice(0, 6).map((meal) => (
+                recommendedMeals.slice(0, 6).map((meal, index) => (
                   <MealCard 
-                    key={meal.$id}
-                    name={meal.name}
+                    key={`meal-${index}`}
+                    meal_name={meal.meal_name}
+                    origin={meal.origin}
                     description={meal.description}
-                    imageUrl={meal.imageUrl}
-                    rating={Math.floor(Math.random() * 20) + 70} // Random rating between 70-90
+                    health_score={meal.health_score}
+                    key_benefits={meal.key_benefits}
                   />
                 ))
               ) : (
@@ -200,13 +198,14 @@ const Explore = () => {
                 <Skeleton key={i} className="w-full h-[300px] rounded-[20px]" />
               ))
             ) : recommendedMeals.length > 0 ? (
-              recommendedMeals.map((meal) => (
+              recommendedMeals.map((meal, index) => (
                 <MealCard 
-                  key={meal.$id}
-                  name={meal.name}
+                  key={`meal-tab-${index}`}
+                  meal_name={meal.meal_name}
+                  origin={meal.origin}
                   description={meal.description}
-                  imageUrl={meal.imageUrl}
-                  rating={Math.floor(Math.random() * 20) + 70} // Random rating between 70-90
+                  health_score={meal.health_score}
+                  key_benefits={meal.key_benefits}
                 />
               ))
             ) : (

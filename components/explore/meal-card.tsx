@@ -18,13 +18,12 @@ const getDailyValue = <T,>(items: T[]): T => {
 };
 
 interface MealItem {
-  name: string;
+  meal_name: string;
+  origin: string;
   description: string;
-  rating?: number;
-  imageUrl?: string;
-  id?: string;
-  category?: string;
-  // Add other meal properties that might be needed
+  health_score: number;
+  key_benefits: string[];
+  why_it_fits: string;
 }
 
 interface SpotlightedMealProps {
@@ -39,18 +38,22 @@ export const SpotlightedMeal = ({ meals = [] }: SpotlightedMealProps) => {
     return null;
   }
   
-  const { name, description } = dailyMeal;
+  const { meal_name, description, health_score, origin } = dailyMeal;
   
   return (
     <Card className='bg-[#2C2C2C] relative w-full lg:w-[716px] min-h-full border-[0.5px] border-[#404040] rounded-[20px] p-0 hover:border-[#F9E8CD] transition-colors duration-200'>
 
       <div className='px-5 pt-2'>
-        <h2 className='text-[24px] font-bold'>{name}</h2>
+        <h2 className='text-[24px] font-bold'>{meal_name}</h2>
+        <div className='flex items-center gap-3 mt-1'>
+          <span className='text-[#A3A3A3] text-xs'>{origin}</span>
+          <span className='text-[#B4F1CF] text-xs font-medium'>Score: {health_score}/100</span>
+        </div>
         <p className='text-[#A3A3A3] text-[14px] mt-2 line-clamp-3'>{description}</p>
       </div>
       <div className='px-5 pb-5 mt-4'>
         <Link 
-          href={`/meals/${encodeURIComponent(name.toLowerCase())}`} 
+          href={`/meals/${encodeURIComponent(meal_name.toLowerCase())}`} 
           className='text-[#F9E8CD] text-sm font-medium flex gap-1 items-center hover:opacity-80 transition-opacity w-fit'
         >
           View details <ChevronRight width={14} height={14} />
@@ -105,28 +108,35 @@ export const TopInsight = ({ blogs = [] }: TopInsightProps) => {
 
 
 interface MealCardProps {
-  name: string;
+  meal_name: string;
+  origin: string;
   description: string;
-  imageUrl?: string;
-  rating: number;
+  health_score: number;
+  key_benefits: string[];
 }
 
-const MealCard = ({ name, description, imageUrl, rating }: MealCardProps) => {
+const MealCard = ({ meal_name, origin, description, health_score, key_benefits }: MealCardProps) => {
   return (
     <div className="h-full">
       <Card className='bg-[#2C2C2C] relative w-full h-full p-5 border-[0.5px] border-[#404040] rounded-[20px] hover:border-[#F9E8CD] transition-colors duration-200'>
         <CardContent className='p-0 space-y-4 h-full flex flex-col'>
           
-          <h3 className="text-xl font-semibold line-clamp-1">{name}</h3>
+          <h3 className="text-xl font-semibold line-clamp-1">{meal_name}</h3>
           <div className="flex items-center gap-2">
             <Image src='/assets/rating-icon.svg' alt='rating' width={24} height={24} />
             <span className="text-lg font-medium">
-              <span className="text-[#B4F1CF]">{rating}</span>/100
+              <span className="text-[#B4F1CF]">{health_score}</span>/100
             </span>
           </div>
+          <p className="text-[#A3A3A3] text-xs">{origin}</p>
           <p className="text-gray-400 text-sm line-clamp-3 flex-grow">{description}</p>
+          <div className="flex flex-wrap gap-1">
+            {key_benefits.slice(0, 3).map((benefit) => (
+              <span key={benefit} className="text-xs bg-[#3A3A3A] text-[#A3A3A3] px-2 py-0.5 rounded-full">{benefit}</span>
+            ))}
+          </div>
           <Link 
-            href={`/meals/${encodeURIComponent(name.toLowerCase())}`} 
+            href={`/meals/${encodeURIComponent(meal_name.toLowerCase())}`} 
             className='text-[#F9E8CD] text-sm font-medium flex gap-1 items-center mt-auto self-start hover:opacity-80 transition-opacity'
           >
             View details <ChevronRight width={14} height={14} />
