@@ -1,4 +1,4 @@
-from fastapi import APIRouter, Depends, HTTPException
+from fastapi import APIRouter, Depends, HTTPException, UploadFile, File
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy import select, text
 from pydantic import BaseModel
@@ -11,7 +11,6 @@ import base64
 import httpx
 from dotenv import load_dotenv
 import google.generativeai as genai
-from typing import Optional
 
 load_dotenv()
 
@@ -35,9 +34,6 @@ class IncomingMessage(BaseModel):
     phone: str
     message: str
 
-class ImageTest(BaseModel):
-    image_url: str  # paste any public image URL to test
-
 
 @router.post("/message")
 async def receive_message(data: IncomingMessage, db: AsyncSession = Depends(get_db)):
@@ -52,6 +48,31 @@ async def receive_message(data: IncomingMessage, db: AsyncSession = Depends(get_
         print("User found:", user["firstName"] if user else "No user found")
     except Exception as e:
         print("User lookup error:", str(e))
+
+    user_id = user["id"] if user else None
+    chat_token = None
+    is_new_user = False
+    conversation_history = ""
+
+    if user_id:
+        token_result = await db.execute(
+            select(Message.token).where(Message.user_id == user_id).limit(1)
+        )
+        chat_token = token_result.scalar_one_or_none()
+        is_new_user = chat_token is None
+        if not chat_token:
+            chat_token = uuid.uuid4()
+
+        history_result = await db.execute(
+            select(Message)
+            .where(Message.user_id == user_id)
+            .order_by(Message.created_at.desc())
+            .limit(5)
+        )
+        history = list(reversed(history_result.scalars().all()))
+        for msg in history:
+            role = "User" if msg.role == "user" else "Seek"
+            conversation_history += f"{role}: {msg.content}\n"
 
     if user:
         prompt = f"""You are Seek, a friendly health assistant created by 5 cracked developers.
@@ -68,9 +89,11 @@ Here is what you know about this user:
 - Height: {user["height"]}
 - Weight: {user["weight"]}
 
-Use this information to give personalised answers. Answer this: {data.message}
+Previous conversation:
+{conversation_history}
 
-Keep your answer concise and under 1000 characters.
+Now answer this: {data.message}
+
 At the end of your answer always add:
 Want to explore more? Visit us at {SEEK_WEB_URL}"""
     else:
@@ -79,25 +102,12 @@ You help people with questions about food, drugs, nutrition and wellness.
 Only answer health related questions.
 If asked something unrelated, politely say you can only help with health topics.
 
-Answer this: {data.message}
+Now answer this: {data.message}
 
-Keep your answer concise and under 1000 characters.
 At the end of your answer always add:
 Want to explore more? Visit us at {SEEK_WEB_URL}"""
 
-    user_id = user["id"] if user else None
-    chat_token = None
-    is_new_user = False
-
     if user_id:
-        token_result = await db.execute(
-            select(Message.token).where(Message.user_id == user_id).limit(1)
-        )
-        chat_token = token_result.scalar_one_or_none()
-        is_new_user = chat_token is None
-        if not chat_token:
-            chat_token = uuid.uuid4()
-
         user_message = Message(
             user_id=user_id,
             phone_number=data.phone,
@@ -172,7 +182,6 @@ If asked something unrelated, politely redirect them.
 
 Answer this: {data.message}
 
-Keep your answer concise and under 1000 characters.
 At the end always add:
 Want to explore more? Visit us at {SEEK_WEB_URL}"""
         )
@@ -189,18 +198,15 @@ Want to explore more? Visit us at {SEEK_WEB_URL}"""
 
 
 @router.post("/test/image")
-async def test_image(data: ImageTest):
+async def test_image(file: UploadFile = File(...)):
     try:
-        # Download image from the URL
-        async with httpx.AsyncClient(timeout=30) as client:
-            image_response = await client.get(data.image_url, follow_redirects=True)
-            image_bytes = image_response.content
-            image_b64 = base64.b64encode(image_bytes).decode("utf-8")
+        image_bytes = await file.read()
+        image_b64 = base64.b64encode(image_bytes).decode("utf-8")
 
         def _analyse():
             image_part = {
                 "inline_data": {
-                    "mime_type": "image/jpeg",
+                    "mime_type": file.content_type or "image/jpeg",
                     "data": image_b64
                 }
             }
@@ -212,7 +218,6 @@ Identify what it is and provide:
 3. Potential risks or side effects
 4. A short health recommendation
 
-Keep your response concise and under 1000 characters.
 End with: Want to explore more? Visit us at seekapp.com"""
 
             response = model.generate_content([prompt, image_part])
@@ -220,9 +225,10 @@ End with: Want to explore more? Visit us at seekapp.com"""
 
         answer = await asyncio.to_thread(_analyse)
         return {
-            "image_url": data.image_url,
+            "filename": file.filename,
             "analysis": answer
         }
 
     except Exception as e:
         print("Image test error:", str(e))
+        raise HTTPException(status_code=500, detail=f"Image analysis failed: {str(e)}")
