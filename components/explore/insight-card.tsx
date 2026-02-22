@@ -1,27 +1,33 @@
-import Link from 'next/link';
 import { Card, CardContent } from '@/components/ui/card';
-import { ChevronRight } from 'lucide-react';
 import Image from 'next/image';
+import Link from 'next/link';
+import { ChevronRight } from 'lucide-react';
 
 const categoryIcons: Record<string, string> = {
   nutrition: '/assets/nutrition.svg',
   fitness: '/assets/fitness.svg',
   meals: '/assets/meals.svg',
+  lifestyle: '/assets/products.svg',
+  culture: '/assets/products.svg',
   default: '/assets/products.svg',
 };
 
 interface InsightCardProps {
-  id: string;
   title: string;
   category: string;
+  brief_outline: string;
+  estimated_reading_time: string;
+  target_audience: string;
   className?: string;
 }
 
-export const InsightCard = ({ id, title, category, className = '' }: InsightCardProps) => {
+export const InsightCard = ({ title, category, brief_outline, estimated_reading_time, target_audience, className = '' }: InsightCardProps) => {
   const iconSrc = categoryIcons[category.toLowerCase()] || categoryIcons.default;
-  
+
+  const href = `/insights/${encodeURIComponent(title)}?category=${encodeURIComponent(category)}&reading_time=${encodeURIComponent(estimated_reading_time)}&target_audience=${encodeURIComponent(target_audience)}`;
+
   return (
-    <Link href={`/insights/${id}`} className={`block h-full ${className}`}>
+    <Link href={href} className={`block h-full ${className}`}>
       <Card className='bg-[#2C2C2C] h-full border-[0.5px] border-[#404040] rounded-[20px] hover:border-[#F9E8CD] transition-colors duration-200 group'>
         <CardContent className='p-6 h-full flex flex-col'>
           <div className='flex justify-between items-start mb-4'>
@@ -39,12 +45,17 @@ export const InsightCard = ({ id, title, category, className = '' }: InsightCard
             </div>
           </div>
           
-          <h3 className='text-lg font-semibold mb-4 line-clamp-3 group-hover:text-[#F9E8CD] transition-colors'>
+          <h3 className='text-lg font-semibold mb-2 line-clamp-3 group-hover:text-[#F9E8CD] transition-colors'>
             {title}
           </h3>
+
+          <p className='text-sm text-gray-400 mb-4 line-clamp-3'>
+            {brief_outline}
+          </p>
           
-          <div className='mt-auto pt-4 border-t border-[#404040] flex items-center text-[#F9E8CD] text-sm font-medium group-hover:underline'>
-            Read <ChevronRight className='ml-1' size={16} />
+          <div className='mt-auto pt-4 border-t border-[#404040] flex items-center justify-between text-sm'>
+            <span className='text-gray-500'>{estimated_reading_time}</span>
+            <span className='text-[#F9E8CD] flex items-center gap-1 group-hover:underline'>Read <ChevronRight size={14} /></span>
           </div>
         </CardContent>
       </Card>

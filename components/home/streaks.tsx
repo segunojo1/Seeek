@@ -1,8 +1,6 @@
 'use client';
 
 import { Flame } from 'lucide-react';
-import { useEffect } from 'react';
-import { useStreaksStore } from '@/store/streaks.store';
 
 interface StreakBoxProps {
   active: boolean;
@@ -17,15 +15,14 @@ const StreakBox = ({ active }: StreakBoxProps) => (
 );
 
 const Streaks = () => {
-  const { streakCount, fetchStreakCount, isLoading } = useStreaksStore();
   const totalDays = 30;
   
   // Create an array of 30 days
   const days = Array.from({ length: totalDays }, (_, i) => i + 1);
 
-  useEffect(() => {
-    fetchStreakCount();
-  }, [fetchStreakCount]);
+  // useEffect(() => {
+  //   fetchStreakCount();
+  // }, [fetchStreakCount]);
 
   return (
     <section className="max-w-[342px] w-full">
@@ -34,14 +31,14 @@ const Streaks = () => {
           {days.map((day) => (
             <StreakBox 
               key={day} 
-              active={day <= streakCount}
+              active={day <= 0}
             />
           ))}
         </div>
         <div className="flex items-center justify-between">
           <div>
             <p className='text-[18px] text-[#737373] dark:text-[#D4D4D4] font-bold satoshi'>
-              {isLoading ? 'Loading...' : `${streakCount} day${streakCount !== 1 ? 's' : ''} streak`}
+              0 day streak
             </p>
             <p className='text-[14px] text-[#F9E8CD] dark:text-[#F9E8CD]'>View Full Stats</p>
           </div>

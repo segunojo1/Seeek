@@ -4,6 +4,7 @@ import {
   MealRecommendation,
   MealPlan,
   BlogPost,
+  BlogDetail,
   MealDetails,
 } from "@/services/products.service";
 
@@ -14,7 +15,7 @@ interface ProductsStore {
 
   // Blog-related state
   blogs: BlogPost[];
-  currentBlog: BlogPost | null;
+  currentBlog: BlogDetail | null;
 
   // Common state
   isLoading: boolean;
@@ -32,8 +33,8 @@ interface ProductsStore {
   currentMeal: MealDetails | null;
   fetchMealDetails: (mealName: string) => Promise<MealDetails | null>;
   setCurrentMeal: (meal: MealDetails | null) => void;
-  fetchBlogById: (id: string) => Promise<BlogPost | null>;
-  setCurrentBlog: (blog: BlogPost | null) => void;
+  fetchBlogDetail: (blog: BlogPost) => Promise<BlogDetail | null>;
+  setCurrentBlog: (blog: BlogDetail | null) => void;
 
   // Common actions
   clearError: () => void;
@@ -53,6 +54,10 @@ export const useProductsStore = create<ProductsStore>((set, get) => ({
   setCurrentMeal: (meal) => set({ currentMeal: meal }),
 
   fetchMealDetails: async (mealName) => {
+    const { isLoading, currentMeal } = get();
+    // Skip if already loading or same meal is loaded
+    if (isLoading) return null;
+    if (currentMeal && currentMeal.mealName === mealName) return currentMeal;
     try {
       set({ isLoading: true, error: null });
 
@@ -64,8 +69,8 @@ export const useProductsStore = create<ProductsStore>((set, get) => ({
       }
 
       if (data) {
-        set({ currentMeal: data?.value });
-        return data?.value;
+        set({ currentMeal: data });
+        return data;
       }
 
       // If we get here, there was no data and no error was thrown
@@ -86,6 +91,9 @@ export const useProductsStore = create<ProductsStore>((set, get) => ({
   },
 
   fetchRecommendedMeals: async () => {
+    const { isLoading, recommendedMeals } = get();
+    // Skip if already loading or data already fetched
+    if (isLoading || recommendedMeals.length > 0) return;
     try {
       set({ isLoading: true, error: null });
       const meals = await productService.getRecommendedMeals();
@@ -104,23 +112,9 @@ export const useProductsStore = create<ProductsStore>((set, get) => ({
     }
   },
 
+  // generateMealPlan is not currently available
   generateMealPlan: async () => {
-    try {
-      set({ isLoading: true, error: null });
-      const plan = await productService.generateMealPlan();
-      set({ mealPlan: plan });
-    } catch (error) {
-      console.error("Error in generateMealPlan:", error);
-      set({
-        error:
-          error instanceof Error
-            ? error.message
-            : "Failed to generate meal plan",
-        mealPlan: null,
-      });
-    } finally {
-      set({ isLoading: false });
-    }
+    console.warn("generateMealPlan is not implemented yet");
   },
 
   setRecommendedMeals: (meals: MealRecommendation[]) => {
@@ -137,10 +131,12 @@ export const useProductsStore = create<ProductsStore>((set, get) => ({
 
   // Blog actions
   fetchAllBlogs: async () => {
+    const { isLoading, blogs } = get();
+    if (isLoading || blogs.length > 0) return;
     try {
       set({ isLoading: true, error: null });
-      const blogs = await productService.getAllBlogs();
-      set({ blogs });
+      const fetchedBlogs = await productService.getAllBlogs();
+      set({ blogs: fetchedBlogs });
     } catch (error) {
       console.error("Error in fetchAllBlogs:", error);
       set({
@@ -152,16 +148,16 @@ export const useProductsStore = create<ProductsStore>((set, get) => ({
     }
   },
 
-  fetchBlogById: async (id: string) => {
+  fetchBlogDetail: async (blog: BlogPost) => {
     try {
       set({ isLoading: true, error: null });
-      const blog = await productService.getBlogById(id);
-      if (blog) {
-        set({ currentBlog: blog });
+      const detail = await productService.getBlogDetail(blog);
+      if (detail) {
+        set({ currentBlog: detail });
       }
-      return blog;
+      return detail;
     } catch (error) {
-      console.error("Error in fetchBlogById:", error);
+      console.error("Error in fetchBlogDetail:", error);
       set({
         error:
           error instanceof Error ? error.message : "Failed to fetch blog post",
@@ -173,7 +169,7 @@ export const useProductsStore = create<ProductsStore>((set, get) => ({
     }
   },
 
-  setCurrentBlog: (blog: BlogPost | null) => {
+  setCurrentBlog: (blog: BlogDetail | null) => {
     set({ currentBlog: blog });
   },
 }));

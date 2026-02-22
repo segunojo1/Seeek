@@ -17,16 +17,22 @@ export interface MealRecommendationsResponse {
 }
 
 export interface BlogPost {
-  $id: string;
-  id: string;
   title: string;
   category: string;
-  text: string;
+  brief_outline: string;
+  estimated_reading_time: string;
+  target_audience: string;
 }
 
 export interface BlogResponse {
-  $id: string;
-  content: BlogPost[];
+  blog_topics: BlogPost[];
+}
+
+export interface BlogDetail {
+  title: string;
+  content: string;
+  seo_keywords: string[];
+  word_count: number;
 }
 
 export interface MealPlan {
@@ -184,22 +190,27 @@ export class ProductService {
 
   public async getAllBlogs(): Promise<BlogPost[]> {
     try {
-      const response = await this.api.get<BlogResponse>(
-        "/api/Blog/GenerateAllBlogs",
-      );
-      return response.data?.content || [];
+      const response = await this.api.get<BlogResponse>("/api/v1/blog");
+      return response.data?.blog_topics || [];
     } catch (error) {
       console.error("Error fetching blogs:", error);
       return [];
     }
   }
 
-  public async getBlogById(id: string): Promise<BlogPost | null> {
+  public async getBlogDetail(blog: BlogPost): Promise<BlogDetail | null> {
     try {
-      const response = await this.api.get<BlogPost>(`/api/Blog/${id}`);
+      const response = await this.api.get<BlogDetail>("/api/v1/blog", {
+        params: {
+          topic: blog.title,
+          category: blog.category,
+          reading_time: blog.estimated_reading_time,
+          target_audience: blog.target_audience,
+        },
+      });
       return response.data || null;
     } catch (error) {
-      console.error("Error fetching blog post:", error);
+      console.error("Error fetching blog detail:", error);
       return null;
     }
   }

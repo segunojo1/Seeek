@@ -36,6 +36,8 @@ export const useScanStore = create<ScanStore>((set) => ({
   barcodeResult: null,
 
   scanImage: async (file: File) => {
+    const { isScanning } = useScanStore.getState();
+    if (isScanning) return null;
     set({ isScanning: true, error: null });
 
     // Create a preview URL for the scanned image
@@ -77,6 +79,8 @@ export const useScanStore = create<ScanStore>((set) => ({
   },
 
   scanBarcode: async (file: File) => {
+    const { isScanning } = useScanStore.getState();
+    if (isScanning) return null;
     set({ isScanning: true, error: null });
     const imageUrl = URL.createObjectURL(file);
 

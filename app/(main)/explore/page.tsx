@@ -184,12 +184,14 @@ const Explore = () => {
               </div>
             ) : blogs.length > 0 ? (
               <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-                {blogs.slice(0, 6).map((blog) => (
+                {blogs.slice(0, 6).map((blog, index) => (
                   <InsightCard
-                    key={`discover-${blog.id}`}
-                    id={blog.id}
+                    key={`discover-${index}`}
                     title={blog.title}
                     category={blog.category}
+                    brief_outline={blog.brief_outline}
+                    estimated_reading_time={blog.estimated_reading_time}
+                    target_audience={blog.target_audience}
                   />
                 ))}
               </div>
@@ -265,12 +267,14 @@ const Explore = () => {
             </div>
           ) : blogs.length > 0 ? (
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-              {blogs.map((blog) => (
+              {blogs.map((blog, index) => (
                 <InsightCard
-                  key={blog.id}
-                  id={blog.id}
+                  key={index}
                   title={blog.title}
                   category={blog.category}
+                  brief_outline={blog.brief_outline}
+                  estimated_reading_time={blog.estimated_reading_time}
+                  target_audience={blog.target_audience}
                 />
               ))}
             </div>

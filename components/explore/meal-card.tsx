@@ -69,9 +69,10 @@ export const SpotlightedMeal = ({ meals = [] }: SpotlightedMealProps) => {
 
 interface TopInsightProps {
   blogs: Array<{
-    id: string;
     title: string;
     category: string;
+    brief_outline: string;
+    estimated_reading_time: string;
   }>;
 }
 
@@ -99,13 +100,15 @@ export const TopInsight = ({ blogs = [] }: TopInsightProps) => {
         <p className="text-xl leading-tight font-bold line-clamp-3">
           {dailyBlog.title}
         </p>
+        <p className="text-sm text-gray-400 mt-2 line-clamp-2">
+          {dailyBlog.brief_outline}
+        </p>
       </CardContent>
-      <Link
-        href={`/insights/${dailyBlog.id}`}
-        className="text-[#F9E8CD] text-sm font-medium flex gap-1 items-center px-5 py-3 hover:opacity-80 transition-opacity"
-      >
-        Read <ChevronRight size={16} />
-      </Link>
+      <div className="text-[#F9E8CD] text-sm font-medium flex gap-1 items-center px-5 py-3 hover:opacity-80 transition-opacity">
+        <span className="text-xs text-gray-500">
+          {dailyBlog.estimated_reading_time}
+        </span>
+      </div>
     </Card>
   );
 };
