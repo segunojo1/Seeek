@@ -4,6 +4,7 @@ import {
   QrCodeAnalysisResponse,
 } from "@/services/products.service";
 import { productService } from "@/services/products.service";
+import { useUserStore } from "@/store/user.store";
 
 interface ScanStore {
   scanResult: ImageScanResponse | null;
@@ -14,6 +15,30 @@ interface ScanStore {
   scanImage: (file: File) => Promise<ImageScanResponse | null>;
   scanBarcode: (file: File) => Promise<QrCodeAnalysisResponse | null>;
   clearScan: () => void;
+}
+
+function extractNdc(decodedText: string): string {
+  const clean = decodedText.replace(/\D/g, "");
+
+  // 12-digit UPC (Standard Retail) — NDC is the 10 digits between first and last
+  if (clean.length === 12) {
+    return clean.substring(1, 11);
+  }
+
+  // GS1 DataMatrix (Complex Healthcare barcode)
+  if (clean.length > 12) {
+    return clean.substring(2, 12);
+  }
+
+  return clean; // Fallback for 10/11 digit codes
+}
+
+function formatNdc(ndc: string): string {
+  const digits = ndc.replace(/\D/g, "");
+  if (digits.length === 10) {
+    return `${digits.substring(0, 4)}-${digits.substring(4, 8)}-${digits.substring(8, 10)}`;
+  }
+  return digits;
 }
 
 async function extractBarcodeData(file: File): Promise<string> {
@@ -86,9 +111,9 @@ export const useScanStore = create<ScanStore>((set) => ({
 
     try {
       // Extract barcode/QR code data from the image
-      const scanData = await extractBarcodeData(file);
+      const rawData = await extractBarcodeData(file);
 
-      if (!scanData) {
+      if (!rawData) {
         set({
           isScanning: false,
           error: "No barcode or QR code found in the image",
@@ -96,8 +121,22 @@ export const useScanStore = create<ScanStore>((set) => ({
         return null;
       }
 
+      // Extract and format NDC from raw barcode
+      const ndc = extractNdc(rawData);
+      const scanData = formatNdc(ndc);
+
+      // Get user allergies from the user store
+      const user = useUserStore.getState().user;
+      const userProfile = {
+        allergies: user?.allergies || [],
+        isPregnant: false,
+      };
+
       // Send extracted data to the API
-      const { data, error } = await productService.analyzeQrCode(scanData);
+      const { data, error } = await productService.analyzeQrCode(
+        scanData,
+        userProfile,
+      );
 
       if (error || !data) {
         set({ isScanning: false, error: error || "Analysis failed" });

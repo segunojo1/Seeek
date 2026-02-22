@@ -51,34 +51,33 @@ export interface MealPlan {
   }>;
 }
 
-export interface NutritionInfo {
-  calories: string;
-  carbs: string;
-  protein: string;
-  fat: string;
-  fiber: string;
-  sodium: string;
-}
-
 export interface MealDetails {
-  mealName: string;
-  generalHealthScore: number;
-  personalizedHealthScore: number;
-  description: string;
-  tags: {
-    $id?: string;
-    $values: string[];
+  meal_identity: {
+    name: string;
+    origin: string;
+    estimated_calories: string;
   };
-  nutrition: NutritionInfo;
-  recipeSteps: {
-    $id?: string;
-    $values: string[];
+  ingredient_list: string[];
+  nutritional_deconstruction: {
+    macros: string;
+    glycemic_index_estimate: string;
+    key_vitamins_minerals: string[];
   };
-  usage: string;
-  alternatives: {
-    $id?: string;
-    $values: string[];
+  health_impact_metrics: {
+    overall_score: number;
+    digestive_load: string;
+    energy_sustainability: string;
   };
+  personalized_optimizations: Array<{
+    original_ingredient: string;
+    recommended_swap: string;
+    benefit_to_user_goals: string;
+  }>;
+  risk_and_ailment_report: Array<{
+    potential_issue: string;
+    trigger_ingredient: string;
+    mitigation_strategy: string;
+  }>;
 }
 
 export interface ImageScanRiskItem {
@@ -200,13 +199,11 @@ export class ProductService {
 
   public async getBlogDetail(blog: BlogPost): Promise<BlogDetail | null> {
     try {
-      const response = await this.api.get<BlogDetail>("/api/v1/blog", {
-        params: {
-          topic: blog.title,
-          category: blog.category,
-          reading_time: blog.estimated_reading_time,
-          target_audience: blog.target_audience,
-        },
+      const response = await this.api.post<BlogDetail>("/api/v1/blog", {
+        topic: blog.title,
+        category: blog.category,
+        reading_time: blog.estimated_reading_time,
+        target_audience: blog.target_audience,
       });
       return response.data || null;
     } catch (error) {
@@ -219,12 +216,16 @@ export class ProductService {
     mealName: string,
   ): Promise<{ data: MealDetails | null; error: string | null }> {
     try {
-      const response = await this.api.post<MealDetails>("/api/v1/getAnalysis", {
-        mealName,
-      });
+      const response = await this.api.post<{ response: MealDetails }>(
+        "/api/v1/getAnalysis",
+        {
+          mealName,
+        },
+      );
 
-      if (response.data) {
-        return { data: response.data, error: null };
+      const mealData = (response.data as any)?.response ?? response.data;
+      if (mealData?.meal_identity) {
+        return { data: mealData as MealDetails, error: null };
       }
 
       return { data: null, error: "No meal data received" };
@@ -270,11 +271,12 @@ export class ProductService {
 
   public async analyzeQrCode(
     scanData: string,
+    userProfile: { allergies: string[]; isPregnant: boolean },
   ): Promise<{ data: QrCodeAnalysisResponse | null; error: string | null }> {
     try {
       const response = await this.api.post<QrCodeAnalysisResponse>(
         "/api/v1/analyzeQrCode",
-        { scanData },
+        { scanData, userProfile },
       );
 
       if (response.data) {

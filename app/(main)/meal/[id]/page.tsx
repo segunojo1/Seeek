@@ -276,125 +276,193 @@ function ScanResultContent({
 
 /* ─── Meal Analysis View (from /api/v1/getAnalysis) ─── */
 function MealAnalysisContent({ meal }: { meal: MealDetails }) {
-  const tags = meal.tags?.$values || [];
-  const recipeSteps = meal.recipeSteps?.$values || [];
-  const alternatives = meal.alternatives?.$values || [];
+  const {
+    meal_identity,
+    ingredient_list,
+    nutritional_deconstruction,
+    health_impact_metrics,
+    personalized_optimizations,
+    risk_and_ailment_report,
+  } = meal;
+
+  const scoreColor = (score: number) => {
+    if (score >= 80) return "text-[#B4F1CF]";
+    if (score >= 60) return "text-[#E89E28]";
+    return "text-red-400";
+  };
 
   return (
     <div className="max-w-[1000px] w-full px-6 space-y-10">
-      {/* Header */}
+      {/* Header — Identity & Score */}
       <div className="bg-[#424242] rounded-[32px] p-8 md:p-10 shadow-lg">
-        <h2 className="text-[26px] leading-tight font-bold mb-3 text-white">
-          {meal.mealName}
-        </h2>
-
-        {tags.length > 0 && (
-          <div className="flex flex-wrap gap-2 mb-5">
-            {tags.map((tag, i) => (
-              <span
-                key={i}
-                className="bg-[#2C2C2C] text-[#D1D1D1] text-xs px-3 py-1.5 rounded-full"
-              >
-                {tag}
-              </span>
-            ))}
-          </div>
-        )}
-
-        <p className="text-[#D1D1D1] text-[15px] leading-[1.6] mb-6">
-          {meal.description}
-        </p>
-
-        {/* Health Scores */}
-        <div className="flex gap-6">
-          <div className="bg-[#2C2C2C] rounded-2xl p-5 flex-1 text-center">
-            <p className="text-[#A3A3A3] text-xs uppercase tracking-wide mb-2">
-              General Health Score
-            </p>
-            <p className="text-[#B4F1CF] text-3xl font-bold">
-              {meal.generalHealthScore}
-              <span className="text-[#A3A3A3] text-lg font-normal">/100</span>
+        <div className="flex items-start justify-between gap-4 mb-4">
+          <div>
+            <h2 className="text-[26px] leading-tight font-bold text-white">
+              {meal_identity.name}
+            </h2>
+            <p className="text-[#A3A3A3] text-sm mt-1">
+              Origin:{" "}
+              <span className="text-[#D1D1D1]">{meal_identity.origin}</span>
             </p>
           </div>
-          <div className="bg-[#2C2C2C] rounded-2xl p-5 flex-1 text-center">
-            <p className="text-[#A3A3A3] text-xs uppercase tracking-wide mb-2">
-              Personalized Score
+          <div className="bg-[#2C2C2C] rounded-2xl px-5 py-3 text-center shrink-0">
+            <p className="text-[#A3A3A3] text-[10px] uppercase tracking-wide mb-0.5">
+              Health Score
             </p>
-            <p className="text-[#E89E28] text-3xl font-bold">
-              {meal.personalizedHealthScore}
+            <p
+              className={`text-3xl font-bold ${scoreColor(health_impact_metrics.overall_score)}`}
+            >
+              {health_impact_metrics.overall_score}
               <span className="text-[#A3A3A3] text-lg font-normal">/100</span>
             </p>
           </div>
         </div>
+
+        <div className="flex flex-wrap gap-4 text-sm">
+          <div className="bg-[#2C2C2C] rounded-xl px-4 py-2">
+            <span className="text-[#A3A3A3]">Calories: </span>
+            <span className="text-white font-medium">
+              {meal_identity.estimated_calories}
+            </span>
+          </div>
+          <div className="bg-[#2C2C2C] rounded-xl px-4 py-2">
+            <span className="text-[#A3A3A3]">Digestive Load: </span>
+            <span className="text-white font-medium">
+              {health_impact_metrics.digestive_load}
+            </span>
+          </div>
+        </div>
       </div>
 
-      {/* Nutrition */}
-      {meal.nutrition && (
+      {/* Ingredients */}
+      {ingredient_list?.length > 0 && (
+        <div>
+          <h3 className="text-[#E89E28] text-xl font-semibold mb-4">
+            Ingredients
+          </h3>
+          <div className="flex flex-wrap gap-2">
+            {ingredient_list.map((item, i) => (
+              <span
+                key={i}
+                className="bg-[#333333] text-[#D1D1D1] text-xs px-3 py-1.5 rounded-full"
+              >
+                {item}
+              </span>
+            ))}
+          </div>
+        </div>
+      )}
+
+      {/* Nutritional Deconstruction */}
+      {nutritional_deconstruction && (
         <div>
           <h3 className="text-[#E89E28] text-xl font-semibold mb-5">
-            Nutrition Information
+            Nutritional Breakdown
           </h3>
-          <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
-            {Object.entries(meal.nutrition).map(([key, value]) => (
-              <div
-                key={key}
-                className="bg-[#333333] rounded-2xl p-4 text-center"
-              >
-                <p className="text-[#A3A3A3] text-xs uppercase tracking-wide mb-1">
-                  {key}
+          <div className="space-y-4">
+            <div className="bg-[#333333] rounded-2xl p-5">
+              <p className="text-[#A3A3A3] text-xs uppercase tracking-wide mb-1">
+                Macros
+              </p>
+              <p className="text-[#D1D1D1] text-[15px] leading-relaxed">
+                {nutritional_deconstruction.macros}
+              </p>
+            </div>
+            <div className="bg-[#333333] rounded-2xl p-5">
+              <p className="text-[#A3A3A3] text-xs uppercase tracking-wide mb-1">
+                Glycemic Index Estimate
+              </p>
+              <p className="text-[#D1D1D1] text-[15px] leading-relaxed">
+                {nutritional_deconstruction.glycemic_index_estimate}
+              </p>
+            </div>
+            {nutritional_deconstruction.key_vitamins_minerals?.length > 0 && (
+              <div>
+                <p className="text-[#A3A3A3] text-xs uppercase tracking-wide mb-2">
+                  Key Vitamins & Minerals
                 </p>
-                <p className="text-white text-lg font-semibold">{value}</p>
+                <div className="flex flex-wrap gap-2">
+                  {nutritional_deconstruction.key_vitamins_minerals.map(
+                    (v, i) => (
+                      <span
+                        key={i}
+                        className="bg-[#2C2C2C] text-[#B4F1CF] text-xs px-3 py-1.5 rounded-full"
+                      >
+                        {v}
+                      </span>
+                    ),
+                  )}
+                </div>
+              </div>
+            )}
+          </div>
+        </div>
+      )}
+
+      {/* Energy Sustainability */}
+      {health_impact_metrics.energy_sustainability && (
+        <div>
+          <h3 className="text-[#19C481] text-xl font-semibold mb-3">
+            Energy Sustainability
+          </h3>
+          <p className="text-[#D1D1D1] text-[15px] leading-relaxed bg-[#333333] rounded-2xl p-5">
+            {health_impact_metrics.energy_sustainability}
+          </p>
+        </div>
+      )}
+
+      {/* Risk & Ailment Report */}
+      {risk_and_ailment_report?.length > 0 && (
+        <div>
+          <h3 className="text-red-400 text-xl font-semibold mb-5">
+            Risk & Ailment Report
+          </h3>
+          <div className="space-y-4">
+            {risk_and_ailment_report.map((risk, i) => (
+              <div key={i} className="bg-[#333333] rounded-2xl p-5 space-y-2">
+                <div className="flex items-center gap-2">
+                  <span className="w-2 h-2 rounded-full bg-red-400 shrink-0" />
+                  <p className="text-white text-[15px] font-semibold">
+                    {risk.potential_issue}
+                  </p>
+                </div>
+                <p className="text-[#A3A3A3] text-[13px]">
+                  Trigger:{" "}
+                  <span className="text-[#E89E28]">
+                    {risk.trigger_ingredient}
+                  </span>
+                </p>
+                <p className="text-[#D1D1D1] text-[14px] leading-relaxed">
+                  {risk.mitigation_strategy}
+                </p>
               </div>
             ))}
           </div>
         </div>
       )}
 
-      {/* Usage */}
-      {meal.usage && (
-        <div>
-          <h3 className="text-[#19C481] text-xl font-semibold mb-3">Usage</h3>
-          <p className="text-[#D1D1D1] text-[15px] leading-relaxed bg-[#333333] rounded-2xl p-5">
-            {meal.usage}
-          </p>
-        </div>
-      )}
-
-      {/* Recipe Steps */}
-      {recipeSteps.length > 0 && (
-        <div>
-          <h3 className="text-[#A78BFA] text-xl font-semibold mb-4">
-            Recipe Steps
-          </h3>
-          <ol className="space-y-3">
-            {recipeSteps.map((step, i) => (
-              <li key={i} className="flex items-start gap-3">
-                <span className="text-[#A78BFA] font-bold mt-0.5 shrink-0">
-                  {i + 1}.
-                </span>
-                <p className="text-[#D1D1D1] text-[14px] leading-relaxed">
-                  {step}
-                </p>
-              </li>
-            ))}
-          </ol>
-        </div>
-      )}
-
-      {/* Alternatives */}
-      {alternatives.length > 0 && (
+      {/* Personalized Optimizations */}
+      {personalized_optimizations?.length > 0 && (
         <div>
           <h3 className="text-[#19C481] text-xl font-semibold mb-4">
-            Alternatives
+            Personalized Optimizations
           </h3>
-          <div className="flex flex-wrap gap-3">
-            {alternatives.map((alt, i) => (
-              <span
-                key={i}
-                className="bg-[#333333] text-[#D1D1D1] text-sm px-4 py-2 rounded-full"
-              >
-                {alt}
-              </span>
+          <div className="space-y-4">
+            {personalized_optimizations.map((opt, i) => (
+              <div key={i} className="bg-[#333333] rounded-2xl p-5 space-y-3">
+                <p className="text-[#B3B3B3] text-xs uppercase tracking-wide">
+                  Instead of
+                </p>
+                <p className="text-white text-[14px] font-medium">
+                  {opt.original_ingredient}
+                </p>
+                <p className="text-[#19C481] text-[14px]">
+                  → {opt.recommended_swap}
+                </p>
+                <p className="text-[#D1D1D1] text-[13px] leading-relaxed">
+                  {opt.benefit_to_user_goals}
+                </p>
+              </div>
             ))}
           </div>
         </div>
