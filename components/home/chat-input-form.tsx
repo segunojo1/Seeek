@@ -33,12 +33,15 @@ const ChatInputForm = ({
   onSend: (message: string, file?: File) => void;
   disabled?: boolean;
 }) => {
-  // Check if the browser supports the Web Speech API
+  // Check if the browser supports the Web Speech API (deferred to avoid SSR crash)
   const isSpeechSupported =
-    "webkitSpeechRecognition" in window || "SpeechRecognition" in window;
+    typeof window !== "undefined" &&
+    ("webkitSpeechRecognition" in window || "SpeechRecognition" in window);
   const [selectedFile, setSelectedFile] = useState<File | null>(null);
   const [previewUrl, setPreviewUrl] = useState<string>("");
-  const [mode, setMode] = useState<"ask" | "search" | "scan" | "barcode">("ask");
+  const [mode, setMode] = useState<"ask" | "search" | "scan" | "barcode">(
+    "ask",
+  );
   const [isListening, setIsListening] = useState<boolean>(false);
   const [volume, setVolume] = useState<number>(0);
   const [interimTranscript, setInterimTranscript] = useState<string>("");
@@ -213,7 +216,11 @@ const ChatInputForm = ({
       return;
     }
     // For other modes, only allow PDFs
-    else if (mode !== "scan" && mode !== "barcode" && file.type !== "application/pdf") {
+    else if (
+      mode !== "scan" &&
+      mode !== "barcode" &&
+      file.type !== "application/pdf"
+    ) {
       toast.error("Only PDF files are supported for this mode");
       return;
     }
@@ -283,39 +290,39 @@ const ChatInputForm = ({
                     )}
                     <div className="mt-2 flex items-center gap-3">
                       {(mode === "scan" || mode === "barcode") &&
-                      form.getValues("chat") && (
-                        <>
-                          <span className="text-sm text-gray-700 dark:text-gray-300">
-                            {form.getValues("chat")}
-                          </span>
-                          <a
-                            href={`/meals/${encodeURIComponent(form.getValues("chat"))}`}
-                            className="text-xs text-blue-500 hover:underline flex items-center gap-1 whitespace-nowrap"
-                            onClick={(e) => {
-                              e.preventDefault();
-                              router.push(
-                                `/meals/${encodeURIComponent(form.getValues("chat"))}`,
-                              );
-                            }}
-                          >
-                            <span>Open in page</span>
-                            <svg
-                              className="w-3 h-3"
-                              fill="none"
-                              stroke="currentColor"
-                              viewBox="0 0 24 24"
-                              xmlns="http://www.w3.org/2000/svg"
+                        form.getValues("chat") && (
+                          <>
+                            <span className="text-sm text-gray-700 dark:text-gray-300">
+                              {form.getValues("chat")}
+                            </span>
+                            <a
+                              href={`/meals/${encodeURIComponent(form.getValues("chat"))}`}
+                              className="text-xs text-blue-500 hover:underline flex items-center gap-1 whitespace-nowrap"
+                              onClick={(e) => {
+                                e.preventDefault();
+                                router.push(
+                                  `/meals/${encodeURIComponent(form.getValues("chat"))}`,
+                                );
+                              }}
                             >
-                              <path
-                                strokeLinecap="round"
-                                strokeLinejoin="round"
-                                strokeWidth={2}
-                                d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14"
-                              />
-                            </svg>
-                          </a>
-                        </>
-                      )}
+                              <span>Open in page</span>
+                              <svg
+                                className="w-3 h-3"
+                                fill="none"
+                                stroke="currentColor"
+                                viewBox="0 0 24 24"
+                                xmlns="http://www.w3.org/2000/svg"
+                              >
+                                <path
+                                  strokeLinecap="round"
+                                  strokeLinejoin="round"
+                                  strokeWidth={2}
+                                  d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14"
+                                />
+                              </svg>
+                            </a>
+                          </>
+                        )}
                       {mode !== "scan" && mode !== "barcode" && (
                         <button
                           type="button"

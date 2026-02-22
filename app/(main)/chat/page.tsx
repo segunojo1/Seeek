@@ -16,22 +16,32 @@ const Chat = () => {
   };
 
   return (
-    <div className="w-full flex flex-col items-center bg-[#FAFAFA] dark:bg-[#262626] max-h-screen h-full">
-      <Image
-        src="/assets/logo.png"
-        alt=""
-        width={103}
-        height={90}
-        className="mx-auto mb-[55px]"
-      />
+    <div className="w-full flex flex-col items-center bg-[#FAFAFA] dark:bg-[#262626] h-screen overflow-hidden">
+      <div className="flex-shrink-0 pt-4">
+        <Image
+          src="/assets/logo.png"
+          alt=""
+          width={103}
+          height={90}
+          className="mx-auto"
+        />
+      </div>
 
-      <div className="flex flex-col justify-between h-full max-w-[750px] pb-10">
-        {messages.length === 0 ? (
-          <WelcomeScreen onSend={handleSend} />
-        ) : (
-          <ChatMessageList messages={messages} isLoading={isLoading} />
-        )}
-        <ChatInputForm onSend={handleSend} disabled={isLoading} />
+      <div className="flex flex-col flex-1 min-h-0 w-full max-w-[750px] pb-4">
+        <div className="flex-1 min-h-0 overflow-hidden">
+          {messages.length === 0 ? (
+            <WelcomeScreen onSend={handleSend} />
+          ) : (
+            <ChatMessageList
+              messages={messages}
+              isLoading={isLoading}
+              onSend={handleSend}
+            />
+          )}
+        </div>
+        <div className="flex-shrink-0">
+          <ChatInputForm onSend={handleSend} disabled={isLoading} />
+        </div>
       </div>
       <HelpCircle className="absolute bottom-5 right-5 text-gray-400 hover:text-gray-600 cursor-pointer" />
     </div>

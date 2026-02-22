@@ -1,6 +1,6 @@
-import { create } from 'zustand';
-import { persist, createJSONStorage } from 'zustand/middleware';
-import { User } from '@/services/auth.service';
+import { create } from "zustand";
+import { persist, createJSONStorage } from "zustand/middleware";
+import { User } from "@/services/auth.service";
 
 type UserStore = {
   user: User | null;
@@ -18,8 +18,8 @@ export const useUserStore = create<UserStore>()(
       clearUser: () => set({ user: null, isAuthenticated: false }),
     }),
     {
-      name: 'user-storage', // name of the item in the storage (must be unique)
+      name: "user-storage", // name of the item in the storage (must be unique)
       storage: createJSONStorage(() => localStorage), // (optional) use localStorage for persistence
-    }
-  )
+    },
+  ),
 );

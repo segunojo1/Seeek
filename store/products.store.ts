@@ -1,34 +1,40 @@
-import { create } from 'zustand';
-import { productService, MealRecommendation, MealPlan, BlogPost, MealDetails } from '@/services/products.service';
+import { create } from "zustand";
+import {
+  productService,
+  MealRecommendation,
+  MealPlan,
+  BlogPost,
+  MealDetails,
+} from "@/services/products.service";
 
 interface ProductsStore {
   // Existing meal-related state
   recommendedMeals: MealRecommendation[];
   mealPlan: MealPlan | null;
-  
+
   // Blog-related state
   blogs: BlogPost[];
   currentBlog: BlogPost | null;
-  
+
   // Common state
   isLoading: boolean;
   error: string | null;
-  
+
   // Meal actions
   fetchRecommendedMeals: () => Promise<void>;
   generateMealPlan: () => Promise<void>;
   setRecommendedMeals: (meals: MealRecommendation[]) => void;
   setMealPlan: (plan: MealPlan | null) => void;
-  
+
   // Blog actions
   fetchAllBlogs: () => Promise<void>;
-  
+
   currentMeal: MealDetails | null;
   fetchMealDetails: (mealName: string) => Promise<MealDetails | null>;
   setCurrentMeal: (meal: MealDetails | null) => void;
   fetchBlogById: (id: string) => Promise<BlogPost | null>;
   setCurrentBlog: (blog: BlogPost | null) => void;
-  
+
   // Common actions
   clearError: () => void;
 }
@@ -42,33 +48,36 @@ export const useProductsStore = create<ProductsStore>((set, get) => ({
   currentMeal: null,
   isLoading: false,
   error: null,
-  
+
   // Meal details actions
   setCurrentMeal: (meal) => set({ currentMeal: meal }),
-  
+
   fetchMealDetails: async (mealName) => {
     try {
       set({ isLoading: true, error: null });
-      
+
       const { data, error } = await productService.getMealDetails(mealName);
-      
+
       if (error) {
-        console.warn('Error in meal details response:', error);
+        console.warn("Error in meal details response:", error);
         // Continue even if there's an error, as we want to try to display what we have
       }
-      
+
       if (data) {
         set({ currentMeal: data?.value });
         return data?.value;
       }
-      
+
       // If we get here, there was no data and no error was thrown
-      throw new Error('No meal data available');
+      throw new Error("No meal data available");
     } catch (error) {
-      console.error('Error in fetchMealDetails:', error);
-      set({ 
-        error: error instanceof Error ? error.message : 'Failed to fetch meal details',
-        currentMeal: null
+      console.error("Error in fetchMealDetails:", error);
+      set({
+        error:
+          error instanceof Error
+            ? error.message
+            : "Failed to fetch meal details",
+        currentMeal: null,
       });
       return null;
     } finally {
@@ -82,10 +91,13 @@ export const useProductsStore = create<ProductsStore>((set, get) => ({
       const meals = await productService.getRecommendedMeals();
       set({ recommendedMeals: meals });
     } catch (error) {
-      console.error('Error in fetchRecommendedMeals:', error);
-      set({ 
-        error: error instanceof Error ? error.message : 'Failed to fetch recommended meals',
-        recommendedMeals: []
+      console.error("Error in fetchRecommendedMeals:", error);
+      set({
+        error:
+          error instanceof Error
+            ? error.message
+            : "Failed to fetch recommended meals",
+        recommendedMeals: [],
       });
     } finally {
       set({ isLoading: false });
@@ -98,10 +110,13 @@ export const useProductsStore = create<ProductsStore>((set, get) => ({
       const plan = await productService.generateMealPlan();
       set({ mealPlan: plan });
     } catch (error) {
-      console.error('Error in generateMealPlan:', error);
-      set({ 
-        error: error instanceof Error ? error.message : 'Failed to generate meal plan',
-        mealPlan: null
+      console.error("Error in generateMealPlan:", error);
+      set({
+        error:
+          error instanceof Error
+            ? error.message
+            : "Failed to generate meal plan",
+        mealPlan: null,
       });
     } finally {
       set({ isLoading: false });
@@ -119,7 +134,7 @@ export const useProductsStore = create<ProductsStore>((set, get) => ({
   clearError: () => {
     set({ error: null });
   },
-  
+
   // Blog actions
   fetchAllBlogs: async () => {
     try {
@@ -127,16 +142,16 @@ export const useProductsStore = create<ProductsStore>((set, get) => ({
       const blogs = await productService.getAllBlogs();
       set({ blogs });
     } catch (error) {
-      console.error('Error in fetchAllBlogs:', error);
-      set({ 
-        error: error instanceof Error ? error.message : 'Failed to fetch blogs',
-        blogs: []
+      console.error("Error in fetchAllBlogs:", error);
+      set({
+        error: error instanceof Error ? error.message : "Failed to fetch blogs",
+        blogs: [],
       });
     } finally {
       set({ isLoading: false });
     }
   },
-  
+
   fetchBlogById: async (id: string) => {
     try {
       set({ isLoading: true, error: null });
@@ -146,17 +161,18 @@ export const useProductsStore = create<ProductsStore>((set, get) => ({
       }
       return blog;
     } catch (error) {
-      console.error('Error in fetchBlogById:', error);
-      set({ 
-        error: error instanceof Error ? error.message : 'Failed to fetch blog post',
-        currentBlog: null
+      console.error("Error in fetchBlogById:", error);
+      set({
+        error:
+          error instanceof Error ? error.message : "Failed to fetch blog post",
+        currentBlog: null,
       });
       return null;
     } finally {
       set({ isLoading: false });
     }
   },
-  
+
   setCurrentBlog: (blog: BlogPost | null) => {
     set({ currentBlog: blog });
   },

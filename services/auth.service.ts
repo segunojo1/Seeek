@@ -227,6 +227,21 @@ class AuthService {
         token?: string;
         user?: User;
       }>("/api/v1/signup", payload);
+
+      // Store token and user in cookies on successful signup
+      if (response.data.token) {
+        Cookies.set("token", response.data.token, this.COOKIE_OPTIONS);
+        this.api.defaults.headers.common["Authorization"] =
+          `Bearer ${response.data.token}`;
+      }
+      if (response.data.user) {
+        Cookies.set(
+          "user",
+          JSON.stringify(response.data.user),
+          this.COOKIE_OPTIONS,
+        );
+      }
+
       return response.data;
     } catch (error: any) {
       console.error("Registration failed:", error);
