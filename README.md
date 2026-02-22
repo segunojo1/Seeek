@@ -1,7 +1,7 @@
 # Seek
 ## AI-Powered Preventive Health Platform
 
-![Seek App Screenshot](/app_ss.png)
+![Seek App Screenshot](frontend/public/app_ss.png)
 
 Seek is an AI-powered health companion built by Team Dimroid that provides personalised health recommendations based on your profile, food habits, and medication usage.
 
