@@ -141,7 +141,9 @@ export function AppSidebar() {
           <SidebarGroupContent className="flex items-center justify-between">
             <div className="flex items-center gap-[10px]">
               <Image src="/assets/side.svg" alt="" width={24} height={24} />
-              <p className="text-[14px] font-bold">{user?.name || "User"}</p>
+              <p className="text-[14px] font-bold">
+                {user?.firstName || "User"}
+              </p>
             </div>
             <div className="flex items-center gap-[5px]">
               <SidebarTrigger />
