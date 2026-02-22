@@ -170,7 +170,7 @@ async def get_chat_history(token: str, db: AsyncSession = Depends(get_db)):
     }
 
 
-@router.post("/test")
+@router.post("/test") # I'm testing with swagger the connection to Gemini and the response format, to make sure everything is working before i connect it to the webhook and start handling real user messages.
 async def test_bot(data: IncomingMessage):
     try:
         print("Calling Gemini for test...")
