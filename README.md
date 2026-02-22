@@ -1,7 +1,7 @@
-# Seek
+# [Seek](https://seeek.vercel.app)
 ## AI-Powered Preventive Health Platform
 
-![Seek App Screenshot](/app_ss.png)
+![Seek App Screenshot](frontend/public/app_ss.png)
 
 Seek is an AI-powered health companion built by Team Dimroid that provides personalised health recommendations based on your profile, food habits, and medication usage.
 
@@ -27,8 +27,6 @@ Seek is an AI-powered health companion built by Team Dimroid that provides perso
 
 - **WhatsApp Bot** - You don't need to open an app. Just message Seek on WhatsApp like you would a friend. Ask about a drug, a food, a symptom — get an instant AI response right in your chat. Your full conversation history is always saved and accessible via your personal link.
 
-- **Family Health Profile** - Add your family members and their medical conditions, allergies and history. Seek uses this to factor in hereditary risks when giving you recommendations — because your family's health history is part of your health story too.
-
 - **Health Dashboard** - A central view of everything Seek knows about you. Your recommendations, food analyses, drug checks and health insights all in one place so you can track your preventive health journey over time.
 
 - **Chat History** - Every conversation you have with the Seek WhatsApp bot is stored securely and tied to your account. Access your full history anytime via your personal link — so nothing gets lost between sessions.
@@ -52,7 +50,7 @@ Seek is an AI-powered health companion built by Team Dimroid that provides perso
 
 ## Getting Started
 
-Visit [seeek.vercel.app](https://seeek.vercel.app) to create your account and get started.
+Visit [seeek.vercel.com](https://seeek.vercel.app) to create your account and get started.
 
 To use the WhatsApp bot, simply message our Seek WhatsApp number and start asking health questions instantly.
 
