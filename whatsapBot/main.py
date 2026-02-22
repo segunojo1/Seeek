@@ -6,7 +6,7 @@ from webhook import router as webhook_router
 
 app = FastAPI()
 app.include_router(router)
-app.include_router(webhook_router)
+app.include_router(webhook_router) # the webhook router is responsible for handling incoming messages from Twilio and responding to them.
 
  
 @app.on_event("startup")

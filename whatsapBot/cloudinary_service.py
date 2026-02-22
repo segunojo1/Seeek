@@ -16,9 +16,9 @@ cloudinary.config(
 async def upload_twilio_image(media_url: str) -> str:
     """
     Downloads image from Twilio and uploads to Cloudinary.
-    Returns a clean public Cloudinary URL.
+    Then i return a Cloudinary URL.
     """
-    # Download from Twilio
+    # Download image from Twilio
     async with httpx.AsyncClient(timeout=30) as client:
         response = await client.get(
             media_url,
@@ -30,8 +30,8 @@ async def upload_twilio_image(media_url: str) -> str:
     # Upload to Cloudinary
     result = cloudinary.uploader.upload(
         image_bytes,
-        folder="seek-bot",
+        folder="seek-bot", # rhis is the cloudinary folder where i will be storing the images
         resource_type="image"
     )
 
-    return result["secure_url"]
+    return result["secure_url"] # this url will be used for analysis with gemini
