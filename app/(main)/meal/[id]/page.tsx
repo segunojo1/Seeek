@@ -1,24 +1,15 @@
 "use client";
 
-import Image from "next/image";
+import Image from "../../../../frontend/node_modules/next/image";
 import { useScanStore } from "@/store/scan.store";
 import { useProductsStore } from "@/store/products.store";
+import { type MealDetails } from "@/services/products.service";
 import {
-  type MealDetails,
-  type QrCodeAnalysisResponse,
-} from "@/services/products.service";
-import { useRouter, useParams } from "next/navigation";
-import {
-  Loader,
-  ArrowLeft,
-  ShieldCheck,
-  ShieldAlert,
-  Pill,
-  AlertTriangle,
-  BookOpen,
-  Syringe,
-} from "lucide-react";
-import { useEffect, useState } from "react";
+  useRouter,
+  useParams,
+} from "../../../../frontend/node_modules/next/navigation";
+import { Loader, ArrowLeft } from "lucide-react";
+import { useEffect } from "react";
 
 const severityColor = (level: string) => {
   switch (level.toLowerCase()) {
@@ -34,13 +25,7 @@ const severityColor = (level: string) => {
 };
 
 export default function RiskAssessment() {
-  const {
-    scanResult,
-    scannedImageUrl,
-    isScanning,
-    barcodeResult,
-    isBarcodeMode,
-  } = useScanStore();
+  const { scanResult, scannedImageUrl, isScanning } = useScanStore();
   const { currentMeal, fetchMealDetails, isLoading } = useProductsStore();
   const router = useRouter();
   const params = useParams();
@@ -64,44 +49,14 @@ export default function RiskAssessment() {
       <div className="min-h-screen bg-[#1F1F1F] text-white flex flex-col items-center justify-center gap-4">
         <Loader className="w-10 h-10 animate-spin text-[#E89E28]" />
         <p className="text-lg font-medium">
-          {isScanMode
-            ? isBarcodeMode
-              ? "Looking up drug information..."
-              : "Analyzing your meal..."
-            : "Fetching meal analysis..."}
+          {isScanMode ? "Analyzing your meal..." : "Fetching meal analysis..."}
         </p>
       </div>
     );
   }
 
-  // Scan mode — show scan or barcode results
+  // Scan mode — show scan results
   if (isScanMode) {
-    // Barcode/QR result
-    if (isBarcodeMode && barcodeResult) {
-      return (
-        <div className="min-h-screen bg-[#1F1F1F] text-white font-sans flex flex-col items-center selection:bg-orange-500/30 pb-20">
-          <div className="w-full max-w-[1000px] px-6 mt-6">
-            <button
-              onClick={() => router.back()}
-              className="flex items-center gap-2 text-[#A3A3A3] hover:text-white transition-colors mb-4"
-            >
-              <ArrowLeft size={18} /> Back
-            </button>
-          </div>
-
-          <h1 className="text-[28px] md:text-[32px] font-semibold mb-12 tracking-wide">
-            Drug Safety Report
-          </h1>
-
-          <DrugSafetyContent
-            data={barcodeResult}
-            scannedImageUrl={scannedImageUrl}
-          />
-        </div>
-      );
-    }
-
-    // Image scan result
     if (!scanData) {
       return (
         <div className="min-h-screen bg-[#1F1F1F] text-white flex flex-col items-center justify-center gap-4">
@@ -331,237 +286,6 @@ function ScanResultContent({
           </div>
         )}
       </div>
-    </div>
-  );
-}
-
-/* ─── Drug / Barcode Safety Report View ─── */
-function DrugSafetyContent({
-  data,
-  scannedImageUrl,
-}: {
-  data: QrCodeAnalysisResponse;
-  scannedImageUrl: string | null;
-}) {
-  const [expandedSection, setExpandedSection] = useState<string | null>(null);
-
-  const toggle = (section: string) =>
-    setExpandedSection((prev) => (prev === section ? null : section));
-
-  const { identity, safety_report, usage } = data;
-
-  return (
-    <div className="max-w-[1000px] w-full px-6 space-y-8">
-      {/* Drug Identity Card */}
-      <div className="bg-[#424242] rounded-[32px] p-8 md:p-10 shadow-lg">
-        <div className="flex items-start gap-4">
-          {scannedImageUrl && (
-            <div className="h-[100px] w-[100px] relative rounded-2xl overflow-hidden shrink-0">
-              <Image
-                fill
-                src={scannedImageUrl}
-                alt={identity.brand_name}
-                className="object-cover"
-              />
-            </div>
-          )}
-          <div className="flex-1 min-w-0">
-            <div className="flex items-center gap-2 mb-2">
-              <Pill size={16} className="text-[#E89E28] shrink-0" />
-              <span className="bg-[#E89E28]/20 text-[#E89E28] text-[11px] font-semibold px-2.5 py-0.5 rounded-full uppercase tracking-wide">
-                Medication
-              </span>
-            </div>
-            <h2 className="text-[22px] md:text-[26px] leading-tight font-bold text-white mb-2">
-              {identity.brand_name}
-            </h2>
-            {identity.rxcui && (
-              <p className="text-[#A3A3A3] text-sm">
-                RxCUI:{" "}
-                <span className="text-[#D1D1D1] font-mono">
-                  {identity.rxcui}
-                </span>
-              </p>
-            )}
-          </div>
-        </div>
-      </div>
-
-      {/* Safety Status Banner */}
-      <div
-        className={`rounded-2xl p-6 flex items-center gap-4 ${
-          safety_report.is_safe
-            ? "bg-[#19C481]/10 border border-[#19C481]/30"
-            : "bg-red-500/10 border border-red-500/30"
-        }`}
-      >
-        {safety_report.is_safe ? (
-          <ShieldCheck size={32} className="text-[#19C481] shrink-0" />
-        ) : (
-          <ShieldAlert size={32} className="text-red-400 shrink-0" />
-        )}
-        <div>
-          <p
-            className={`text-lg font-semibold ${
-              safety_report.is_safe ? "text-[#19C481]" : "text-red-400"
-            }`}
-          >
-            {safety_report.is_safe
-              ? "Generally Safe for Use"
-              : "Safety Concerns Detected"}
-          </p>
-          {safety_report.danger_details &&
-            safety_report.danger_details !==
-              "No specific danger text found." && (
-              <p className="text-[#D1D1D1] text-sm mt-1">
-                {safety_report.danger_details}
-              </p>
-            )}
-        </div>
-      </div>
-
-      {/* Safety Flags */}
-      {safety_report.flags?.length > 0 && (
-        <div>
-          <h3 className="text-red-400 text-xl font-semibold mb-4 flex items-center gap-2">
-            <AlertTriangle size={20} /> Safety Flags
-          </h3>
-          <div className="space-y-2">
-            {safety_report.flags.map((flag, i) => (
-              <div
-                key={i}
-                className="bg-red-900/20 border border-red-900/40 rounded-xl px-5 py-3 text-red-300 text-[14px]"
-              >
-                {flag}
-              </div>
-            ))}
-          </div>
-        </div>
-      )}
-
-      {/* Contraindications */}
-      {safety_report.contraindications && (
-        <div>
-          <button
-            onClick={() => toggle("contraindications")}
-            className="w-full flex items-center justify-between text-left"
-          >
-            <h3 className="text-[#E89E28] text-xl font-semibold flex items-center gap-2">
-              <AlertTriangle size={20} /> Contraindications
-            </h3>
-            <span className="text-[#A3A3A3] text-sm">
-              {expandedSection === "contraindications" ? "Collapse" : "Expand"}
-            </span>
-          </button>
-          <div
-            className={`mt-4 bg-[#333333] rounded-2xl p-6 transition-all ${
-              expandedSection === "contraindications"
-                ? "max-h-[2000px]"
-                : "max-h-[200px] overflow-hidden relative"
-            }`}
-          >
-            <p className="text-[#D1D1D1] text-[14px] leading-relaxed whitespace-pre-line">
-              {safety_report.contraindications}
-            </p>
-            {expandedSection !== "contraindications" && (
-              <div className="absolute bottom-0 left-0 right-0 h-20 bg-gradient-to-t from-[#333333] to-transparent" />
-            )}
-          </div>
-        </div>
-      )}
-
-      {/* Adverse Reactions */}
-      {safety_report.adverse_reactions && (
-        <div>
-          <button
-            onClick={() => toggle("adverse")}
-            className="w-full flex items-center justify-between text-left"
-          >
-            <h3 className="text-red-400 text-xl font-semibold flex items-center gap-2">
-              <Syringe size={20} /> Adverse Reactions
-            </h3>
-            <span className="text-[#A3A3A3] text-sm">
-              {expandedSection === "adverse" ? "Collapse" : "Expand"}
-            </span>
-          </button>
-          <div
-            className={`mt-4 bg-[#333333] rounded-2xl p-6 transition-all ${
-              expandedSection === "adverse"
-                ? "max-h-[5000px]"
-                : "max-h-[200px] overflow-hidden relative"
-            }`}
-          >
-            <p className="text-[#D1D1D1] text-[14px] leading-relaxed whitespace-pre-line">
-              {safety_report.adverse_reactions}
-            </p>
-            {expandedSection !== "adverse" && (
-              <div className="absolute bottom-0 left-0 right-0 h-20 bg-gradient-to-t from-[#333333] to-transparent" />
-            )}
-          </div>
-        </div>
-      )}
-
-      {/* Indications / What it's used for */}
-      {usage?.indications && (
-        <div>
-          <button
-            onClick={() => toggle("indications")}
-            className="w-full flex items-center justify-between text-left"
-          >
-            <h3 className="text-[#19C481] text-xl font-semibold flex items-center gap-2">
-              <BookOpen size={20} /> Indications & Usage
-            </h3>
-            <span className="text-[#A3A3A3] text-sm">
-              {expandedSection === "indications" ? "Collapse" : "Expand"}
-            </span>
-          </button>
-          <div
-            className={`mt-4 bg-[#333333] rounded-2xl p-6 transition-all ${
-              expandedSection === "indications"
-                ? "max-h-[3000px]"
-                : "max-h-[200px] overflow-hidden relative"
-            }`}
-          >
-            <p className="text-[#D1D1D1] text-[14px] leading-relaxed whitespace-pre-line">
-              {usage.indications}
-            </p>
-            {expandedSection !== "indications" && (
-              <div className="absolute bottom-0 left-0 right-0 h-20 bg-gradient-to-t from-[#333333] to-transparent" />
-            )}
-          </div>
-        </div>
-      )}
-
-      {/* Dosage */}
-      {usage?.dosage && (
-        <div>
-          <button
-            onClick={() => toggle("dosage")}
-            className="w-full flex items-center justify-between text-left"
-          >
-            <h3 className="text-[#A78BFA] text-xl font-semibold flex items-center gap-2">
-              <Pill size={20} /> Dosage Information
-            </h3>
-            <span className="text-[#A3A3A3] text-sm">
-              {expandedSection === "dosage" ? "Collapse" : "Expand"}
-            </span>
-          </button>
-          <div
-            className={`mt-4 bg-[#333333] rounded-2xl p-6 transition-all ${
-              expandedSection === "dosage"
-                ? "max-h-[3000px]"
-                : "max-h-[200px] overflow-hidden relative"
-            }`}
-          >
-            <p className="text-[#D1D1D1] text-[14px] leading-relaxed whitespace-pre-line">
-              {usage.dosage}
-            </p>
-            {expandedSection !== "dosage" && (
-              <div className="absolute bottom-0 left-0 right-0 h-20 bg-gradient-to-t from-[#333333] to-transparent" />
-            )}
-          </div>
-        </div>
-      )}
     </div>
   );
 }

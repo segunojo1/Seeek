@@ -1,5 +1,5 @@
 import axios, { AxiosInstance } from "axios";
-import Cookies from "js-cookie";
+import Cookies from "../frontend/node_modules/@types/js-cookie";
 
 export interface MealRecommendation {
   meal_name: string;
@@ -254,17 +254,12 @@ export class ProductService {
       const formData = new FormData();
       formData.append("image", file);
 
-      const response = await this.api.post(
-        "/api/v1/imageScan",
-        formData,
-        {
-          headers: {
-            "Content-Type": "multipart/form-data",
-          },
+      const response = await this.api.post("/api/v1/imageScan", formData, {
+        headers: {
+          "Content-Type": "multipart/form-data",
         },
-      );
+      });
 
-      // The API may return { response: {...} } or the data directly
       const raw = response.data;
       if (raw && typeof raw === "object") {
         return { data: raw as ImageScanResponse, error: null };
@@ -286,10 +281,10 @@ export class ProductService {
     userProfile: { allergies: string[]; isPregnant: boolean },
   ): Promise<{ data: QrCodeAnalysisResponse | null; error: string | null }> {
     try {
-      const response = await this.api.post(
-        "/api/v1/analyzeQrCode",
-        { scanData, userProfile },
-      );
+      const response = await this.api.post("/api/v1/analyzeQrCode", {
+        scanData,
+        userProfile,
+      });
 
       const raw = response.data;
       if (raw && typeof raw === "object") {

@@ -12,6 +12,7 @@ interface ScanStore {
   isScanning: boolean;
   error: string | null;
   barcodeResult: QrCodeAnalysisResponse | null;
+  isBarcodeMode: boolean;
   scanImage: (file: File) => Promise<ImageScanResponse | null>;
   scanBarcode: (file: File) => Promise<QrCodeAnalysisResponse | null>;
   clearScan: () => void;
@@ -59,11 +60,12 @@ export const useScanStore = create<ScanStore>((set) => ({
   isScanning: false,
   error: null,
   barcodeResult: null,
+  isBarcodeMode: false,
 
   scanImage: async (file: File) => {
     const { isScanning } = useScanStore.getState();
     if (isScanning) return null;
-    set({ isScanning: true, error: null });
+    set({ isScanning: true, error: null, isBarcodeMode: false });
 
     // Create a preview URL for the scanned image
     const imageUrl = URL.createObjectURL(file);
@@ -76,14 +78,19 @@ export const useScanStore = create<ScanStore>((set) => ({
         return null;
       }
 
+      // Normalize: ensure data has { response: {...} } shape
+      const normalized = data.response
+        ? data
+        : ({ response: data } as unknown as typeof data);
+
       set({
-        scanResult: data,
+        scanResult: normalized,
         scannedImageUrl: imageUrl,
         isScanning: false,
         error: null,
       });
 
-      return data;
+      return normalized;
     } catch (err: any) {
       set({
         isScanning: false,
@@ -100,13 +107,14 @@ export const useScanStore = create<ScanStore>((set) => ({
       isScanning: false,
       error: null,
       barcodeResult: null,
+      isBarcodeMode: false,
     });
   },
 
   scanBarcode: async (file: File) => {
     const { isScanning } = useScanStore.getState();
     if (isScanning) return null;
-    set({ isScanning: true, error: null });
+    set({ isScanning: true, error: null, isBarcodeMode: true });
     const imageUrl = URL.createObjectURL(file);
 
     try {
@@ -145,7 +153,7 @@ export const useScanStore = create<ScanStore>((set) => ({
 
       set({
         barcodeResult: data,
-        scanResult: data as unknown as ImageScanResponse,
+        scanResult: null,
         scannedImageUrl: imageUrl,
         isScanning: false,
         error: null,

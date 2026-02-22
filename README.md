@@ -52,7 +52,7 @@ Seek is an AI-powered health companion built by Team Dimroid that provides perso
 
 ## Getting Started
 
-Visit [seekapp.com](https://seekapp.com) to create your account and get started.
+Visit [seeek.vercel.app](https://seeek.vercel.app) to create your account and get started.
 
 To use the WhatsApp bot, simply message our Seek WhatsApp number and start asking health questions instantly.
 
