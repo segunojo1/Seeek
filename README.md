@@ -1,4 +1,4 @@
-# Seek
+# [Seek](https://seek.vercel.app)
 ## AI-Powered Preventive Health Platform
 
 ![Seek App Screenshot](frontend/public/app_ss.png)
