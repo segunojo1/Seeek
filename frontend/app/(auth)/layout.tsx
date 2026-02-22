@@ -8,12 +8,10 @@ export const metadata: Metadata = {
 
 export const dynamic = "force-dynamic";
 
-export default function AuthLayout({ children }: Readonly<{
+export default function AuthLayout({
+  children,
+}: Readonly<{
   children: React.ReactNode;
 }>) {
-  return (
-    <div>
-      {children}
-    </div>
-  )
+  return <div>{children}</div>;
 }
