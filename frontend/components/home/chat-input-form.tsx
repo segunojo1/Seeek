@@ -376,7 +376,7 @@ const ChatInputForm = ({
                     <Textarea
                       placeholder={
                         mode === "ask"
-                          ? "Ask anything… or type @ to see Clark's magic commands..."
+                          ? "Ask anything… or type @ to see Seek's magic commands..."
                           : mode === "search"
                             ? "Search for meals..."
                             : mode === "barcode"
