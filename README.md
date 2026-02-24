@@ -1,6 +1,8 @@
 # [Seek](https://seeek.vercel.app)
 ## AI-Powered Preventive Health Platform
 
+> **Fork Notice:** This project is a fork of [Seek by Dimeji-G](https://github.com/Dimeji-G/Seek). All frontend development work (the `/frontend` directory) was built by me.
+
 ![Seek App Screenshot](frontend/public/app_ss.png)
 
 Seek is an AI-powered health companion built by Team Dimroid that provides personalised health recommendations based on your profile, food habits, and medication usage.
