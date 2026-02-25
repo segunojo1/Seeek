@@ -171,10 +171,10 @@ const SignUpForm = ({ form, onSubmit }: SignUpFormProps) => {
               </FormItem>
             )}
           />
-          <div className="relative flex items-center">
+          {/* <div className="relative flex items-center">
             <div className="w-full border-t border-[#D4D4D4]"></div>
-          </div>
-          <Button
+          </div> */}
+          {/* <Button
             variant="outline"
             className="w-full flex items-center justify-center gap-2 p-4 border-[#D4D4D4] rounded-[5px] border-[1px] h-[52px] text-[16px] font-normal"
             type="button"
@@ -203,7 +203,7 @@ const SignUpForm = ({ form, onSubmit }: SignUpFormProps) => {
               />
             </svg>
             Continue with Google
-          </Button>
+          </Button> */}
           <Link
             href="/auth/login"
             className="text-[#F9E8CD] text-base justify-self-end self-end mb-4"

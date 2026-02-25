@@ -107,7 +107,7 @@ const LoginForm = () => {
             <div className="relative flex items-center">
               <div className="w-full border-t border-[#D4D4D4]"></div>
             </div>
-            <Button
+            {/* <Button
               variant="outline"
               className="w-full flex items-center justify-center gap-2 p-4 border-[#D4D4D4] rounded-[5px] border-[1px] h-[52px] text-[16px] font-normal"
               type="button"
@@ -136,7 +136,7 @@ const LoginForm = () => {
                 />
               </svg>
               Continue with Google
-            </Button>
+            </Button> */}
 
             <Link
               href="/auth/signup"
