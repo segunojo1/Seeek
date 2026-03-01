@@ -126,16 +126,16 @@ export function AppSidebar() {
     // { title: "Reports", url: "/chat", icon: Inbox },
     // { title: "History", url: "/home", icon: Inbox },
   ];
-  const workspaceItems = [
-    { title: "Canvas", url: "/home", icon: Search },
-    { title: "Whiteboard", url: "/home", icon: Home },
-    { title: "Materials", url: "/home", icon: Inbox },
-    { title: "Study Groups", url: "/home", icon: Inbox },
-  ];
+  // const workspaceItems = [
+  //   { title: "Canvas", url: "/home", icon: Search },
+  //   { title: "Whiteboard", url: "/home", icon: Home },
+  //   { title: "Materials", url: "/home", icon: Inbox },
+  //   { title: "Study Groups", url: "/home", icon: Inbox },
+  // ];
 
   const { user } = useUserStore();
   return (
-    <Sidebar className="max-w-[235px] sidebar !bg-[#2C2C2C] text-white">
+    <Sidebar className="min-w-[205px] sidebar !bg-[#2C2C2C] text-white">
       <SidebarHeader>
         <SidebarGroup>
           <SidebarGroupContent className="flex items-center justify-between">
@@ -146,7 +146,7 @@ export function AppSidebar() {
               </p>
             </div>
             <div className="flex items-center gap-[5px]">
-              <SidebarTrigger />
+              
               <SquarePen width={20} height={20} />
             </div>
           </SidebarGroupContent>
