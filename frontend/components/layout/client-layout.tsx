@@ -28,7 +28,7 @@ export default function ClientLayout({
         route.push("/auth/login")
     }
     return (
-        <SidebarProvider defaultOpen={true} >
+        <SidebarProvider defaultOpen={true} open={true}>
             <AppSidebar />
             <main className="w-full relative min-h-screen bg-[#262626]">
                 <div className="flex items-center gap-3 absolute right-[20px] top-[20px]">
